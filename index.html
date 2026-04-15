@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Agent OHADA">
+<meta name="theme-color" content="#1A3A2A">
+<link rel="manifest" href="data:application/json,{%22name%22:%22Agent%20OHADA%22,%22short_name%22:%22OHADA%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%231A3A2A%22,%22theme_color%22:%22%231A3A2A%22}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent OHADA v3 — TPE · PME · Artisans</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C8962A;--gold-light:#F5E6C2;--gold-dark:#8A6418;--gold-pale:#FBF3E0;
+  --green-deep:#1A3A2A;--green-mid:#2E5C3F;--green-light:#E8F2EC;
+  --cream:#FBF7F0;--cream-dark:#EFE8DA;
+  --text-main:#1A1A18;--text-muted:#6B6458;--text-light:#A09585;
+  --border:rgba(200,150,42,0.2);--border-strong:rgba(200,150,42,0.4);
+  --radius:14px;--radius-sm:8px;
+  --shadow:0 2px 16px rgba(26,58,42,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-main);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+/* HEADER */
+header{background:var(--green-deep);padding:0 1.25rem;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid rgba(200,150,42,0.3);z-index:10;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--gold),#E8B84B);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--green-deep);}
+.logo-text{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#fff;}
+.logo-sub{font-size:9.5px;font-weight:300;color:rgba(255,255,255,0.5);letter-spacing:0.05em;text-transform:uppercase;margin-top:1px;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.badge-live{display:flex;align-items:center;gap:5px;background:rgba(200,150,42,0.15);border:1px solid rgba(200,150,42,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--gold);}
+.dot{width:6px;height:6px;background:#4CAF50;border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* LANG SWITCHER */
+.lang-switcher{display:flex;gap:3px;background:rgba(255,255,255,0.08);border-radius:20px;padding:3px;}
+.lang-btn{background:none;border:none;color:rgba(255,255,255,0.5);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;padding:3px 8px;border-radius:15px;cursor:pointer;transition:all 0.15s;}
+.lang-btn.active{background:var(--gold);color:var(--green-deep);}
+.lang-btn:hover:not(.active){color:#fff;}
+
+/* TABS */
+.nav-tabs{background:var(--green-deep);display:flex;gap:0;padding:0 1.25rem;border-bottom:1px solid rgba(200,150,42,0.2);flex-shrink:0;overflow-x:auto;}
+.nav-tabs::-webkit-scrollbar{height:2px;}
+.nav-tab{padding:9px 15px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.5);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;background:none;border-left:none;border-right:none;border-top:none;}
+.nav-tab:hover{color:rgba(255,255,255,0.8);}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* LAYOUT */
+.app-body{display:flex;flex:1;overflow:hidden;}
+.sidebar{width:230px;background:var(--green-deep);border-right:1px solid rgba(200,150,42,0.15);display:flex;flex-direction:column;padding:0.875rem 0.75rem;gap:0.35rem;flex-shrink:0;overflow-y:auto;}
+.sidebar-label{font-size:9px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.25);margin:0.75rem 0 0.3rem 0.4rem;}
+.s-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:var(--radius-sm);padding:8px 10px;text-align:left;cursor:pointer;color:rgba(255,255,255,0.7);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:400;line-height:1.4;transition:all 0.15s;width:100%;}
+.s-btn:hover{background:rgba(200,150,42,0.1);border-color:rgba(200,150,42,0.2);color:#fff;}
+.s-divider{height:1px;background:rgba(255,255,255,0.06);margin:0.35rem 0;}
+.s-disclaimer{margin-top:auto;background:rgba(200,150,42,0.07);border:1px solid rgba(200,150,42,0.12);border-radius:var(--radius-sm);padding:8px 10px;font-size:10px;color:rgba(255,255,255,0.35);line-height:1.6;}
+.s-disclaimer strong{color:rgba(200,150,42,0.65);font-weight:500;}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;display:none;}
+.content.active{display:flex;flex-direction:column;}
+
+/* PANEL */
+.panel{padding:1.25rem;max-width:900px;width:100%;margin:0 auto;}
+.panel-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--green-deep);margin-bottom:5px;}
+.panel-sub{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:1.25rem;}
+
+/* WIZARD */
+.wizard-progress{display:flex;align-items:center;margin-bottom:1.5rem;}
+.wp-step{display:flex;flex-direction:column;align-items:center;flex:1;}
+.wp-circle{width:28px;height:28px;border-radius:50%;background:var(--cream-dark);border:2px solid var(--cream-dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-light);transition:all 0.3s;}
+.wp-circle.done{background:var(--green-deep);border-color:var(--green-deep);color:#fff;}
+.wp-circle.active{background:var(--gold);border-color:var(--gold);color:var(--green-deep);}
+.wp-label{font-size:9.5px;color:var(--text-light);margin-top:3px;text-align:center;}
+.wp-label.active{color:var(--gold);font-weight:500;}
+.wp-line{flex:1;height:2px;background:var(--cream-dark);margin:0 -1px;margin-bottom:12px;transition:background 0.3s;}
+.wp-line.done{background:var(--green-deep);}
+.wizard-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:0.875rem;}
+.wizard-question{font-size:15px;font-weight:600;color:var(--green-deep);margin-bottom:0.875rem;line-height:1.5;}
+.wizard-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px;}
+.w-option{background:var(--cream);border:2px solid var(--border);border-radius:var(--radius-sm);padding:11px 12px;cursor:pointer;transition:all 0.15s;text-align:left;}
+.w-option:hover,.w-option.selected{border-color:var(--gold);background:var(--gold-pale);}
+.w-option .opt-icon{font-size:18px;margin-bottom:5px;display:block;}
+.w-option .opt-label{font-size:12.5px;font-weight:500;color:var(--text-main);}
+.w-option .opt-desc{font-size:10.5px;color:var(--text-muted);margin-top:2px;line-height:1.4;}
+.wizard-nav{display:flex;gap:8px;justify-content:flex-end;margin-top:0.4rem;}
+.btn-prev{padding:8px 18px;border-radius:var(--radius-sm);background:transparent;border:1.5px solid var(--border-strong);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;color:var(--text-muted);cursor:pointer;transition:all 0.15s;}
+.btn-prev:hover{background:var(--cream-dark);}
+.btn-next{padding:8px 18px;border-radius:var(--radius-sm);background:var(--green-deep);border:none;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;color:#fff;cursor:pointer;transition:all 0.15s;}
+.btn-next:hover{background:var(--green-mid);}
+.btn-next:disabled{background:var(--cream-dark);color:var(--text-light);cursor:not-allowed;}
+
+/* RESULT */
+.result-card{background:var(--green-deep);border-radius:var(--radius);padding:1.25rem;color:#fff;margin-bottom:0.875rem;border:1px solid rgba(200,150,42,0.25);}
+.result-badge{display:inline-block;background:var(--gold);color:var(--green-deep);font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;margin-bottom:9px;letter-spacing:0.04em;}
+.result-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:5px;}
+.result-sub{font-size:12.5px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:0.875rem;}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.result-stat{background:rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:9px 11px;}
+.rs-label{font-size:9.5px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.07em;}
+.rs-value{font-size:13px;font-weight:600;color:var(--gold);margin-top:2px;}
+.steps-list{list-style:none;}
+.steps-list li{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.steps-list li:last-child{border-bottom:none;}
+.step-num{width:20px;height:20px;border-radius:50%;flex-shrink:0;background:var(--green-deep);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;margin-top:1px;}
+.step-body strong{display:block;font-weight:500;color:var(--text-main);margin-bottom:2px;}
+.step-body span{font-size:11.5px;color:var(--text-muted);}
+
+/* CHECKLIST */
+.country-selector{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1rem;}
+.country-pill{padding:5px 13px;border-radius:20px;border:1.5px solid var(--border-strong);background:transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text-muted);transition:all 0.15s;}
+.country-pill:hover{border-color:var(--gold);color:var(--gold-dark);}
+.country-pill.active{background:var(--green-deep);border-color:var(--green-deep);color:#fff;}
+.cl-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;}
+.cl-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.cl-item{display:flex;align-items:flex-start;gap:9px;padding:9px 11px;border-radius:var(--radius-sm);margin-bottom:3px;transition:background 0.1s;cursor:pointer;}
+.cl-item:hover{background:var(--green-light);}
+.cl-item.checked{background:var(--green-light);}
+.cl-check{width:17px;height:17px;border-radius:4px;flex-shrink:0;border:1.5px solid var(--border-strong);margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;background:#fff;}
+.cl-item.checked .cl-check{background:var(--green-mid);border-color:var(--green-mid);}
+.cl-check svg{display:none;}
+.cl-item.checked .cl-check svg{display:block;}
+.cl-text strong{display:block;font-size:12.5px;font-weight:500;color:var(--text-main);}
+.cl-text span{font-size:11px;color:var(--text-muted);line-height:1.5;}
+.cl-progress-bar{background:var(--cream-dark);border-radius:4px;height:5px;margin-bottom:1rem;overflow:hidden;}
+.cl-progress-fill{height:100%;background:var(--green-mid);border-radius:4px;transition:width 0.3s;}
+.cl-progress-label{font-size:11.5px;color:var(--text-muted);margin-bottom:5px;}
+.cl-cost-info{background:var(--gold-pale);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:0.875rem;display:flex;gap:12px;align-items:flex-start;}
+.cl-cost-icon{font-size:18px;flex-shrink:0;}
+.cl-cost-text strong{display:block;font-size:12.5px;font-weight:500;color:var(--gold-dark);margin-bottom:2px;}
+.cl-cost-text span{font-size:11.5px;color:var(--text-muted);}
+
+/* GUICHETS OFFICIELS */
+.guichet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:1.5rem;}
+.guichet-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;transition:all 0.15s;}
+.guichet-card:hover{border-color:var(--gold);box-shadow:var(--shadow);}
+.gc-flag{font-size:24px;margin-bottom:6px;}
+.gc-pays{font-size:13.5px;font-weight:600;color:var(--green-deep);margin-bottom:2px;}
+.gc-nom{font-size:11.5px;color:var(--text-muted);margin-bottom:8px;}
+.gc-info{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.gc-info-item{display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--text-muted);}
+.gc-info-item span:first-child{font-size:12px;}
+.gc-link{display:flex;align-items:center;justify-content:center;gap:5px;padding:7px;border-radius:var(--radius-sm);background:var(--green-deep);color:#fff;font-size:12px;font-weight:500;text-decoration:none;transition:background 0.15s;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;width:100%;}
+.gc-link:hover{background:var(--green-mid);}
+.gc-tag{display:inline-block;font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:10px;background:var(--green-light);color:var(--green-mid);margin-bottom:7px;}
+.gc-tag.digital{background:#E3F0FF;color:#1A5C9A;}
+.gc-tag.rapide{background:#EAF3DE;color:#3B6D11;}
+
+/* CALCULATEUR */
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.calc-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;}
+.calc-card h3{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--green-deep);margin-bottom:1rem;}
+.calc-field{margin-bottom:0.875rem;}
+.calc-label{display:block;font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:5px;}
+.calc-input{width:100%;padding:8px 12px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--text-main);background:#fff;outline:none;transition:border-color 0.15s;}
+.calc-input:focus{border-color:var(--gold);}
+select.calc-input{cursor:pointer;}
+.calc-btn{width:100%;padding:10px;border-radius:var(--radius-sm);background:var(--green-deep);border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:#fff;cursor:pointer;transition:background 0.15s;margin-top:0.5rem;}
+.calc-btn:hover{background:var(--green-mid);}
+.result-box{background:var(--green-deep);border-radius:var(--radius);padding:1.25rem;color:#fff;}
+.result-box h3{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;margin-bottom:1rem;color:var(--gold);}
+.r-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:13px;}
+.r-row:last-child{border-bottom:none;}
+.r-row.total{background:rgba(200,150,42,0.15);margin:0 -1.25rem;padding:10px 1.25rem;border-radius:0 0 var(--radius) var(--radius);font-weight:600;font-size:14px;}
+.r-label{color:rgba(255,255,255,0.7);}
+.r-value{font-weight:500;color:#fff;}
+.r-value.gold{color:var(--gold);}
+.r-value.red{color:#F09595;}
+.r-empty{text-align:center;padding:2rem;color:rgba(255,255,255,0.4);font-size:13px;}
+
+/* GESTION */
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:1.25rem;}
+.module-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:7px;}
+.module-card:hover{border-color:var(--gold);box-shadow:var(--shadow);transform:translateY(-1px);}
+.module-card.active{border-color:var(--green-deep);background:var(--green-light);}
+.mc-icon{font-size:22px;}
+.mc-title{font-size:13.5px;font-weight:600;color:var(--green-deep);}
+.mc-desc{font-size:11.5px;color:var(--text-muted);line-height:1.5;}
+.mc-tag{display:inline-block;font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:10px;background:var(--gold-pale);color:var(--gold-dark);letter-spacing:0.04em;}
+.module-content{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;}
+.module-content h3{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--green-deep);margin-bottom:0.875rem;}
+.obligation-item{display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:1px solid var(--border);}
+.obligation-item:last-child{border-bottom:none;}
+.obl-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.obl-dot.red{background:#E24B4A;}
+.obl-dot.amber{background:#EF9F27;}
+.obl-dot.green{background:#639922;}
+.obl-body strong{display:block;font-size:12.5px;font-weight:500;color:var(--text-main);margin-bottom:2px;}
+.obl-body span{font-size:11.5px;color:var(--text-muted);}
+.obl-freq{margin-left:auto;font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:10px;flex-shrink:0;white-space:nowrap;}
+.obl-freq.mensuel{background:#FCEBEB;color:#A32D2D;}
+.obl-freq.annuel{background:#FAEEDA;color:#854F0B;}
+.obl-freq.unique{background:#EAF3DE;color:#3B6D11;}
+
+/* DOCS */
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.doc-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;display:flex;flex-direction:column;gap:7px;transition:all 0.15s;}
+.doc-card:hover{border-color:var(--gold);box-shadow:var(--shadow);}
+.doc-icon{font-size:26px;}
+.doc-title{font-size:13px;font-weight:600;color:var(--green-deep);}
+.doc-desc{font-size:11.5px;color:var(--text-muted);line-height:1.5;flex:1;}
+.doc-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.doc-tag{font-size:9.5px;padding:2px 6px;border-radius:10px;background:var(--green-light);color:var(--green-mid);font-weight:500;}
+.doc-btn{display:flex;align-items:center;gap:5px;justify-content:center;padding:7px 0;border-radius:var(--radius-sm);background:var(--green-deep);color:#fff;font-size:11.5px;font-weight:500;border:none;cursor:pointer;transition:background 0.15s;font-family:'DM Sans',sans-serif;}
+.doc-btn:hover{background:var(--green-mid);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,58,42,0.6);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:var(--radius);width:100%;max-width:600px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--green-deep);}
+.modal-header h2{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#fff;}
+.modal-close{background:none;border:none;color:rgba(255,255,255,0.6);font-size:18px;cursor:pointer;}
+.modal-body{padding:1.25rem;overflow-y:auto;flex:1;}
+.modal-body pre{font-family:'DM Sans',sans-serif;font-size:12.5px;line-height:1.8;white-space:pre-wrap;color:var(--text-main);}
+.modal-footer{padding:0.875rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.btn-copy,.btn-dl{padding:7px 16px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;transition:all 0.15s;}
+.btn-copy{background:transparent;border:1.5px solid var(--border-strong);color:var(--text-muted);}
+.btn-copy:hover{background:var(--cream);}
+.btn-dl{background:var(--green-deep);border:none;color:#fff;}
+.btn-dl:hover{background:var(--green-mid);}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;flex:1;overflow:hidden;}
+.messages{flex:1;overflow-y:auto;padding:1.1rem;display:flex;flex-direction:column;gap:0.875rem;scroll-behavior:smooth;}
+.messages::-webkit-scrollbar{width:3px;}
+.messages::-webkit-scrollbar-thumb{background:var(--cream-dark);border-radius:4px;}
+.welcome-banner{background:var(--green-deep);border-radius:var(--radius);padding:1.25rem;border:1px solid rgba(200,150,42,0.2);position:relative;overflow:hidden;}
+.welcome-banner::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(200,150,42,0.12) 0%,transparent 70%);}
+.wb-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:#fff;margin-bottom:5px;}
+.wb-sub{font-size:12.5px;color:rgba(255,255,255,0.55);line-height:1.6;margin-bottom:0.875rem;font-weight:300;}
+.tags-row{display:flex;flex-wrap:wrap;gap:4px;}
+.c-tag{background:rgba(200,150,42,0.12);border:1px solid rgba(200,150,42,0.2);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--gold);}
+.msg-row{display:flex;gap:9px;align-items:flex-start;}
+.msg-row.user{flex-direction:row-reverse;}
+.avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;}
+.avatar.ai{background:var(--gold);color:var(--green-deep);font-family:'Playfair Display',serif;}
+.avatar.user{background:var(--green-mid);color:#fff;font-size:10px;}
+.bubble{max-width:78%;padding:10px 14px;border-radius:var(--radius);font-size:13px;line-height:1.75;}
+.bubble.ai{background:#fff;border:1px solid var(--border);color:var(--text-main);border-top-left-radius:3px;}
+.bubble.user{background:var(--green-deep);color:#fff;border-top-right-radius:3px;}
+.bubble p{margin-bottom:0.5em;}.bubble p:last-child{margin-bottom:0;}
+.bubble strong{font-weight:500;color:var(--gold-dark);}
+.bubble.user strong{color:var(--gold-light);}
+.bubble ul{padding-left:1.1em;margin:0.4em 0;}.bubble li{margin-bottom:3px;}
+.bubble h3{font-family:'Playfair Display',serif;font-size:13.5px;font-weight:600;margin-bottom:0.3em;color:var(--green-deep);}
+.typing-bubble{background:#fff;border:1px solid var(--border);border-radius:var(--radius);border-top-left-radius:3px;padding:12px 15px;display:flex;gap:4px;align-items:center;}
+.typing-dot{width:6px;height:6px;background:var(--gold);border-radius:50%;animation:typing 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:.2s;}.typing-dot:nth-child(3){animation-delay:.4s;}
+@keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.input-area{padding:0.75rem 1.1rem;background:var(--cream);border-top:1px solid var(--cream-dark);flex-shrink:0;}
+.input-wrap{background:#fff;border:1.5px solid var(--border-strong);border-radius:12px;display:flex;align-items:flex-end;gap:7px;padding:8px 11px;transition:border-color 0.15s;}
+.input-wrap:focus-within{border-color:var(--gold);}
+textarea{flex:1;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-main);resize:none;max-height:100px;line-height:1.5;background:transparent;}
+textarea::placeholder{color:var(--text-light);}
+.send-btn{width:32px;height:32px;border-radius:8px;background:var(--green-deep);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;}
+.send-btn:hover{background:var(--green-mid);transform:scale(1.05);}
+.send-btn:disabled{background:var(--cream-dark);cursor:not-allowed;transform:none;}
+.send-btn svg{width:13px;height:13px;fill:none;stroke:#fff;stroke-width:2.2;}
+.send-btn:disabled svg{stroke:var(--text-light);}
+.input-footer{text-align:center;margin-top:5px;font-size:10px;color:var(--text-light);}
+.quick-pills{display:flex;flex-wrap:wrap;gap:5px;padding:0 1.1rem 0.6rem;}
+.qp{background:#fff;border:1px solid var(--border-strong);border-radius:20px;padding:4px 11px;font-size:11.5px;color:var(--text-muted);cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+.qp:hover{border-color:var(--gold);color:var(--gold-dark);background:var(--gold-pale);}
+
+@media(max-width:640px){.sidebar{display:none;}.nav-tab{padding:8px 10px;font-size:11px;}.calc-grid{grid-template-columns:1fr;}.result-grid{grid-template-columns:1fr 1fr;}}
+
+.apikey-modal{position:fixed;inset:0;background:rgba(26,58,42,0.88);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.apikey-box{background:#fff;border-radius:14px;padding:2rem;width:100%;max-width:420px;}
+.apikey-box h2{font-family:'Playfair Display',serif;font-size:20px;color:#1A3A2A;margin-bottom:8px;}
+.apikey-box p{font-size:13px;color:#6B6458;margin-bottom:1.25rem;line-height:1.6;}
+.apikey-input{width:100%;padding:10px 14px;border:1.5px solid rgba(200,150,42,0.4);border-radius:8px;font-size:13px;outline:none;margin-bottom:1rem;font-family:'DM Sans',sans-serif;}
+.apikey-btn{width:100%;padding:11px;background:#1A3A2A;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.apikey-btn:hover{background:#2E5C3F;}
+.apikey-note{font-size:11px;color:#A09585;margin-top:10px;text-align:center;line-height:1.5;}
+.apikey-skip{background:none;border:none;color:#A09585;font-size:12px;cursor:pointer;width:100%;margin-top:8px;font-family:'DM Sans',sans-serif;}
+
+/* ===== IMPROVED TABLES ===== */
+.table-wrapper{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:1.25rem;}
+.data-table{width:100%;border-collapse:collapse;font-size:13px;}
+.data-table thead tr{background:var(--green-deep);}
+.data-table thead th{padding:11px 14px;text-align:left;color:rgba(255,255,255,0.85);font-weight:500;font-size:11.5px;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;}
+.data-table thead th:first-child{border-radius:var(--radius) 0 0 0;}
+.data-table thead th:last-child{border-radius:0 var(--radius) 0 0;}
+.data-table tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s;}
+.data-table tbody tr:last-child{border-bottom:none;}
+.data-table tbody tr:hover{background:var(--green-light);}
+.data-table tbody td{padding:10px 14px;color:var(--text-main);vertical-align:middle;}
+.data-table tbody td:first-child{font-weight:500;color:var(--green-deep);}
+.td-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;}
+.td-badge.green{background:var(--green-light);color:var(--green-mid);}
+.td-badge.gold{background:var(--gold-pale);color:var(--gold-dark);}
+.td-badge.red{background:#FCEBEB;color:#A32D2D;}
+.td-badge.blue{background:#E3F0FF;color:#1A5C9A;}
+
+/* Improved calc result */
+.calc-result-table{width:100%;border-collapse:collapse;}
+.calc-result-table tr{border-bottom:1px solid rgba(255,255,255,0.08);}
+.calc-result-table tr:last-child{border-bottom:none;}
+.calc-result-table td{padding:10px 0;font-size:13px;}
+.calc-result-table .r-label{color:rgba(255,255,255,0.65);}
+.calc-result-table .r-value{text-align:right;font-weight:500;}
+.calc-total-row{background:rgba(200,150,42,0.15);border-radius:var(--radius-sm);margin-top:8px;}
+.calc-total-row td{padding:12px 14px!important;font-size:14px;font-weight:600;}
+
+/* Improved guichet cards */
+.guichet-table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);}
+.guichet-table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px;}
+.guichet-table thead tr{background:var(--green-deep);}
+.guichet-table thead th{padding:11px 14px;text-align:left;color:rgba(255,255,255,0.8);font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap;}
+.guichet-table tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s;}
+.guichet-table tbody tr:last-child{border-bottom:none;}
+.guichet-table tbody tr:hover{background:var(--green-light);}
+.guichet-table tbody td{padding:11px 14px;vertical-align:middle;}
+.guichet-table .g-flag{font-size:18px;}
+.guichet-table .g-pays{font-weight:600;color:var(--green-deep);display:block;}
+.guichet-table .g-nom{font-size:11.5px;color:var(--text-muted);}
+.guichet-table .g-btn{padding:5px 12px;background:var(--green-deep);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11.5px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;white-space:nowrap;}
+.guichet-table .g-btn:hover{background:var(--green-mid);}
+.guichet-tag{display:inline-block;font-size:9.5px;font-weight:600;padding:2px 7px;border-radius:10px;margin-right:3px;}
+.guichet-tag.digital{background:#E3F0FF;color:#1A5C9A;}
+.guichet-tag.rapide{background:#EAF3DE;color:#3B6D11;}
+
+/* Improved obligation items */
+.obl-table{width:100%;border-collapse:collapse;}
+.obl-table tr{border-bottom:1px solid var(--border);}
+.obl-table tr:last-child{border-bottom:none;}
+.obl-table tr:hover{background:var(--green-light);}
+.obl-table td{padding:10px 8px;vertical-align:top;}
+.obl-indicator{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.obl-title{font-size:13px;font-weight:500;color:var(--text-main);display:block;margin-bottom:2px;}
+.obl-desc{font-size:11.5px;color:var(--text-muted);line-height:1.5;}
+
+
+.apikey-skip{background:none;border:none;color:#A09585;font-size:12px;cursor:pointer;width:100%;margin-top:8px;font-family:'DM Sans',sans-serif;text-decoration:underline;}
+.free-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(200,150,42,0.15);border:1px solid rgba(200,150,42,0.25);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--gold);margin-left:6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚖</div>
+    <div>
+      <div class="logo-text">Agent OHADA v3</div>
+      <div class="logo-sub">TPE · PME · Artisans</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" onclick="setLang('wo')">WO</button>
+      <button class="lang-btn" onclick="setLang('bm')">BM</button>
+      <button class="lang-btn" onclick="setLang('ln')">LN</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <button onclick="resetApiKey()" style="background:rgba(200,150,42,0.15);border:1px solid rgba(200,150,42,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🔑 Clé API</button>
+    <span id="freeCounter" style="background:rgba(200,150,42,0.15);border:1px solid rgba(200,150,42,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--gold);">3 questions gratuites</span>
+    <div class="badge-live"><span class="dot"></span><span id="badgeText">En ligne · 17 pays</span></div>
+  </div>
+</header>
+
+<div class="nav-tabs" id="navTabs">
+  <button class="nav-tab active" onclick="showTab('chat')" data-i18n="tab_chat">💬 Conseiller IA</button>
+  <button class="nav-tab" onclick="showTab('wizard')" data-i18n="tab_wizard">🧭 Créer mon entreprise</button>
+  <button class="nav-tab" onclick="showTab('checklist')" data-i18n="tab_checklist">✅ Checklist pays</button>
+  <button class="nav-tab" onclick="showTab('guichets')" data-i18n="tab_guichets">🏛️ Guichets officiels</button>
+  <button class="nav-tab" onclick="showTab('calcul')" data-i18n="tab_calcul">🧮 Charges sociales</button>
+  <button class="nav-tab" onclick="showTab('gestion')" data-i18n="tab_gestion">📊 Gestion</button>
+  <button class="nav-tab" onclick="showTab('businessplan')" data-i18n="tab_bp">📊 Business Plan IA</button>
+  <button class="nav-tab" onclick="showTab('documents')" data-i18n="tab_documents">📄 Documents</button>
+</div>
+
+<div class="app-body">
+<aside class="sidebar">
+  <div class="sidebar-label" data-i18n="sb_shortcuts">Raccourcis</div>
+  <button class="s-btn" onclick="askChat('Quelle forme juridique pour mon activité ?')">🏢 <span data-i18n="sb_statut">Choisir son statut</span></button>
+  <button class="s-btn" onclick="askChat('Étapes pour créer une SARL OHADA')">📋 <span data-i18n="sb_sarl">Créer une SARL</span></button>
+  <button class="s-btn" onclick="askChat('Capital minimum OHADA')">💰 <span data-i18n="sb_capital">Capital minimum</span></button>
+  <button class="s-btn" onclick="askChat('Avantages du GIE pour artisans')">🤝 <span data-i18n="sb_gie">Le GIE expliqué</span></button>
+  <button class="s-btn" onclick="askChat('Obligations comptables SYSCOHADA TPE')">📒 <span data-i18n="sb_compta">Comptabilité TPE</span></button>
+  <div class="s-divider"></div>
+  <div class="sidebar-label" data-i18n="sb_pays">Par pays</div>
+  <button class="s-btn" onclick="askChat('Créer entreprise Sénégal')">🇸🇳 Sénégal</button>
+  <button class="s-btn" onclick="askChat('Créer entreprise Côte d\'Ivoire')">🇨🇮 Côte d'Ivoire</button>
+  <button class="s-btn" onclick="askChat('Créer entreprise Cameroun')">🇨🇲 Cameroun</button>
+  <button class="s-btn" onclick="askChat('Créer entreprise RDC')">🇨🇩 RD Congo</button>
+  <button class="s-btn" onclick="askChat('Créer entreprise Burkina Faso')">🇧🇫 Burkina Faso</button>
+  <button class="s-btn" onclick="askChat('Créer entreprise Mali')">🇲🇱 Mali</button>
+  <div class="s-divider"></div>
+  <div class="s-disclaimer"><strong data-i18n="disc_title">⚠️ Avertissement</strong><br><span data-i18n="disc_text">Orientation de premier niveau. Ne remplace pas un juriste qualifié.</span></div>
+</aside>
+
+<!-- TAB CHAT -->
+<div class="content active chat-wrap" id="tab-chat">
+  <div class="messages" id="messages">
+    <div class="welcome-banner">
+      <div class="wb-title" data-i18n="welcome_title">Bonjour, je suis votre conseiller OHADA ✨</div>
+      <div class="wb-sub" data-i18n="welcome_sub">Je guide TPE, PME et artisans dans la création et la gestion d'entreprise en zone OHADA — 17 pays d'Afrique francophone.</div>
+      <div class="tags-row">
+        <span class="c-tag">Bénin</span><span class="c-tag">Burkina Faso</span><span class="c-tag">Cameroun</span>
+        <span class="c-tag">Centrafrique</span><span class="c-tag">Comores</span><span class="c-tag">Congo</span>
+        <span class="c-tag">Côte d'Ivoire</span><span class="c-tag">Gabon</span><span class="c-tag">Guinée</span>
+        <span class="c-tag">Guinée Équat.</span><span class="c-tag">Mali</span><span class="c-tag">Niger</span>
+        <span class="c-tag">RD Congo</span><span class="c-tag">Sénégal</span><span class="c-tag">Tchad</span><span class="c-tag">Togo</span>
+      </div>
+    </div>
+  </div>
+  <div class="quick-pills">
+    <span class="qp" onclick="askChat('Je suis artisan, quel statut choisir ?')">🛠️ <span data-i18n="qp_artisan">Je suis artisan</span></span>
+    <span class="qp" onclick="askChat('Comment recruter mon premier employé OHADA ?')">👥 <span data-i18n="qp_employe">Premier employé</span></span>
+    <span class="qp" onclick="askChat('Quelles taxes pour une TPE ?')">💸 <span data-i18n="qp_taxes">Mes taxes</span></span>
+    <span class="qp" onclick="askChat('Litige commercial OHADA, que faire ?')">⚖️ <span data-i18n="qp_litige">Litige commercial</span></span>
+    <span class="qp" onclick="askChat('SYSCOHADA révisé explication')">📒 SYSCOHADA</span>
+  </div>
+  <div class="input-area">
+    <div class="input-wrap">
+      <textarea id="chatInput" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)" data-i18n-ph="chat_placeholder"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="input-footer" data-i18n="chat_footer">Droit OHADA · Conseiller IA · Orientation de premier niveau</div>
+  </div>
+</div>
+
+<!-- TAB WIZARD -->
+<div class="content" id="tab-wizard" style="overflow-y:auto;">
+  <div class="panel">
+    <div class="panel-title" data-i18n="wiz_title">🧭 Créer mon entreprise</div>
+    <div class="panel-sub" data-i18n="wiz_sub">Répondez à 5 questions pour obtenir un plan d'action personnalisé.</div>
+    <div class="wizard-progress">
+      <div class="wp-step"><div class="wp-circle active" id="wc1">1</div><div class="wp-label active" data-i18n="wiz_s1">Profil</div></div>
+      <div class="wp-line" id="wl1"></div>
+      <div class="wp-step"><div class="wp-circle" id="wc2">2</div><div class="wp-label" data-i18n="wiz_s2">Secteur</div></div>
+      <div class="wp-line" id="wl2"></div>
+      <div class="wp-step"><div class="wp-circle" id="wc3">3</div><div class="wp-label" data-i18n="wiz_s3">Associés</div></div>
+      <div class="wp-line" id="wl3"></div>
+      <div class="wp-step"><div class="wp-circle" id="wc4">4</div><div class="wp-label" data-i18n="wiz_s4">Capital</div></div>
+      <div class="wp-line" id="wl4"></div>
+      <div class="wp-step"><div class="wp-circle" id="wc5">5</div><div class="wp-label" data-i18n="wiz_s5">Pays</div></div>
+    </div>
+    <div id="wstep1">
+      <div class="wizard-card">
+        <div class="wizard-question" data-i18n="wq1">Quel type d'entrepreneur êtes-vous ?</div>
+        <div class="wizard-options">
+          <div class="w-option" onclick="selectOpt(this,'profil','artisan')"><span class="opt-icon">🛠️</span><div class="opt-label" data-i18n="wo_artisan">Artisan / Métier</div><div class="opt-desc" data-i18n="wo_artisan_d">Couture, menuiserie, coiffure, plomberie…</div></div>
+          <div class="w-option" onclick="selectOpt(this,'profil','commerce')"><span class="opt-icon">🏪</span><div class="opt-label" data-i18n="wo_commerce">Commerce</div><div class="opt-desc" data-i18n="wo_commerce_d">Boutique, import-export, distribution…</div></div>
+          <div class="w-option" onclick="selectOpt(this,'profil','service')"><span class="opt-icon">💼</span><div class="opt-label" data-i18n="wo_service">Services / Conseil</div><div class="opt-desc" data-i18n="wo_service_d">Consulting, formation, IT, transport…</div></div>
+          <div class="w-option" onclick="selectOpt(this,'profil','agro')"><span class="opt-icon">🌾</span><div class="opt-label" data-i18n="wo_agro">Agro-alimentaire</div><div class="opt-desc" data-i18n="wo_agro_d">Agriculture, élevage, transformation…</div></div>
+        </div>
+      </div>
+      <div class="wizard-nav"><button class="btn-next" id="w1next" disabled onclick="goStep(2)" data-i18n="btn_next">Suivant →</button></div>
+    </div>
+    <div id="wstep2" style="display:none">
+      <div class="wizard-card">
+        <div class="wizard-question" data-i18n="wq2">Quelle est l'ambition de votre projet ?</div>
+        <div class="wizard-options">
+          <div class="w-option" onclick="selectOpt(this,'ambition','micro')"><span class="opt-icon">🌱</span><div class="opt-label" data-i18n="wo_micro">Micro-activité</div><div class="opt-desc" data-i18n="wo_micro_d">Revenu solo, activité principale</div></div>
+          <div class="w-option" onclick="selectOpt(this,'ambition','tpe')"><span class="opt-icon">📈</span><div class="opt-label" data-i18n="wo_tpe">TPE / PME locale</div><div class="opt-desc" data-i18n="wo_tpe_d">Entreprise locale avec employés</div></div>
+          <div class="w-option" onclick="selectOpt(this,'ambition','startup')"><span class="opt-icon">🚀</span><div class="opt-label" data-i18n="wo_startup">Startup / Croissance</div><div class="opt-desc" data-i18n="wo_startup_d">Fort potentiel, levée de fonds</div></div>
+        </div>
+      </div>
+      <div class="wizard-nav"><button class="btn-prev" onclick="goStep(1)" data-i18n="btn_prev">← Retour</button><button class="btn-next" id="w2next" disabled onclick="goStep(3)" data-i18n="btn_next">Suivant →</button></div>
+    </div>
+    <div id="wstep3" style="display:none">
+      <div class="wizard-card">
+        <div class="wizard-question" data-i18n="wq3">Êtes-vous seul·e ou avec des associés ?</div>
+        <div class="wizard-options">
+          <div class="w-option" onclick="selectOpt(this,'associes','seul')"><span class="opt-icon">🙋</span><div class="opt-label" data-i18n="wo_seul">Seul·e</div><div class="opt-desc" data-i18n="wo_seul_d">Entrepreneur individuel</div></div>
+          <div class="w-option" onclick="selectOpt(this,'associes','2-3')"><span class="opt-icon">👥</span><div class="opt-label" data-i18n="wo_23">2 à 3 associés</div><div class="opt-desc" data-i18n="wo_23_d">Petite équipe fondatrice</div></div>
+          <div class="w-option" onclick="selectOpt(this,'associes','4+')"><span class="opt-icon">👨‍👩‍👧‍👦</span><div class="opt-label" data-i18n="wo_4plus">4 associés ou plus</div><div class="opt-desc" data-i18n="wo_4plus_d">Groupe, coopérative, collectif</div></div>
+        </div>
+      </div>
+      <div class="wizard-nav"><button class="btn-prev" onclick="goStep(2)" data-i18n="btn_prev">← Retour</button><button class="btn-next" id="w3next" disabled onclick="goStep(4)" data-i18n="btn_next">Suivant →</button></div>
+    </div>
+    <div id="wstep4" style="display:none">
+      <div class="wizard-card">
+        <div class="wizard-question" data-i18n="wq4">Quel capital pouvez-vous mobiliser ?</div>
+        <div class="wizard-options">
+          <div class="w-option" onclick="selectOpt(this,'capital','zero')"><span class="opt-icon">🪙</span><div class="opt-label" data-i18n="wo_c0">Moins de 100 000 F CFA</div><div class="opt-desc" data-i18n="wo_c0_d">Démarrage sans capital significatif</div></div>
+          <div class="w-option" onclick="selectOpt(this,'capital','moyen')"><span class="opt-icon">💵</span><div class="opt-label" data-i18n="wo_cm">100 000 – 1 M F CFA</div><div class="opt-desc" data-i18n="wo_cm_d">Capital modeste disponible</div></div>
+          <div class="w-option" onclick="selectOpt(this,'capital','eleve')"><span class="opt-icon">💰</span><div class="opt-label" data-i18n="wo_ce">Plus de 1 000 000 F CFA</div><div class="opt-desc" data-i18n="wo_ce_d">Capital conséquent ou financement</div></div>
+        </div>
+      </div>
+      <div class="wizard-nav"><button class="btn-prev" onclick="goStep(3)" data-i18n="btn_prev">← Retour</button><button class="btn-next" id="w4next" disabled onclick="goStep(5)" data-i18n="btn_next">Suivant →</button></div>
+    </div>
+    <div id="wstep5" style="display:none">
+      <div class="wizard-card">
+        <div class="wizard-question" data-i18n="wq5">Dans quel pays créez-vous votre entreprise ?</div>
+        <div class="wizard-options" style="grid-template-columns:repeat(auto-fill,minmax(120px,1fr))">
+          <div class="w-option" onclick="selectOpt(this,'pays','senegal')"><span class="opt-icon">🇸🇳</span><div class="opt-label">Sénégal</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','cotedivoire')"><span class="opt-icon">🇨🇮</span><div class="opt-label">Côte d'Ivoire</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','cameroun')"><span class="opt-icon">🇨🇲</span><div class="opt-label">Cameroun</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','rdc')"><span class="opt-icon">🇨🇩</span><div class="opt-label">RD Congo</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','mali')"><span class="opt-icon">🇲🇱</span><div class="opt-label">Mali</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','burkina')"><span class="opt-icon">🇧🇫</span><div class="opt-label">Burkina Faso</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','togo')"><span class="opt-icon">🇹🇬</span><div class="opt-label">Togo</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','congo')"><span class="opt-icon">🇨🇬</span><div class="opt-label">Congo-Brazza</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','benin')"><span class="opt-icon">🇧🇯</span><div class="opt-label">Bénin</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','niger')"><span class="opt-icon">🇳🇪</span><div class="opt-label">Niger</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','tchad')"><span class="opt-icon">🇹🇩</span><div class="opt-label">Tchad</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','guinee')"><span class="opt-icon">🇬🇳</span><div class="opt-label">Guinée</div></div>
+          <div class="w-option" onclick="selectOpt(this,'pays','autre')"><span class="opt-icon">🌍</span><div class="opt-label" data-i18n="wo_autre">Autre OHADA</div></div>
+        </div>
+      </div>
+      <div class="wizard-nav"><button class="btn-prev" onclick="goStep(4)" data-i18n="btn_prev">← Retour</button><button class="btn-next" id="w5next" disabled onclick="showResult()" data-i18n="btn_result">Voir mon plan →</button></div>
+    </div>
+    <div id="wresult" style="display:none"></div>
+  </div>
+</div>
+
+<!-- TAB CHECKLIST -->
+<div class="content" id="tab-checklist" style="overflow-y:auto;">
+  <div class="panel">
+    <div class="panel-title">✅ <span data-i18n="cl_title">Checklist de création par pays</span></div>
+    <div class="panel-sub" data-i18n="cl_sub">Sélectionnez votre pays pour obtenir la liste complète des documents et démarches.</div>
+    <div class="country-selector">
+      <button class="country-pill active" onclick="loadChecklist('senegal',this)">🇸🇳 Sénégal</button>
+      <button class="country-pill" onclick="loadChecklist('cotedivoire',this)">🇨🇮 Côte d'Ivoire</button>
+      <button class="country-pill" onclick="loadChecklist('cameroun',this)">🇨🇲 Cameroun</button>
+      <button class="country-pill" onclick="loadChecklist('rdc',this)">🇨🇩 RD Congo</button>
+      <button class="country-pill" onclick="loadChecklist('mali',this)">🇲🇱 Mali</button>
+      <button class="country-pill" onclick="loadChecklist('burkina',this)">🇧🇫 Burkina Faso</button>
+      <button class="country-pill" onclick="loadChecklist('togo',this)">🇹🇬 Togo</button>
+      <button class="country-pill" onclick="loadChecklist('gabon',this)">🇬🇦 Gabon</button>
+      <button class="country-pill" onclick="loadChecklist('congo',this)">🇨🇬 Congo-Brazzaville</button>
+      <button class="country-pill" onclick="loadChecklist('benin',this)">🇧🇯 Bénin</button>
+      <button class="country-pill" onclick="loadChecklist('niger',this)">🇳🇪 Niger</button>
+      <button class="country-pill" onclick="loadChecklist('tchad',this)">🇹🇩 Tchad</button>
+      <button class="country-pill" onclick="loadChecklist('guinee',this)">🇬🇳 Guinée</button>
+    </div>
+    <div class="cl-progress-label" id="clProgressLabel">0 / 0 étapes complétées</div>
+    <div class="cl-progress-bar"><div class="cl-progress-fill" id="clProgressFill" style="width:0%"></div></div>
+    <div id="clCostInfo"></div>
+    <div id="checklistContent"></div>
+  </div>
+</div>
+
+<!-- TAB GUICHETS OFFICIELS -->
+<div class="content" id="tab-guichets" style="overflow-y:auto;">
+  <div class="panel">
+    <div class="panel-title">🏛️ <span data-i18n="gu_title">Guichets uniques officiels</span></div>
+    <div class="panel-sub" data-i18n="gu_sub">Liens directs vers les organismes officiels de création d'entreprise dans chaque pays OHADA.</div>
+    <div class="guichet-grid" id="guichetGrid"></div>
+  </div>
+</div>
+
+<!-- TAB CALCUL CHARGES -->
+<div class="content" id="tab-calcul" style="overflow-y:auto;">
+  <div class="panel">
+    <div class="panel-title">🧮 <span data-i18n="cc_title">Calculateur de charges sociales</span></div>
+    <div class="panel-sub" data-i18n="cc_sub">Estimez le coût total employeur et le salaire net selon le pays et la catégorie professionnelle.</div>
+    <div class="calc-grid">
+      <div class="calc-card">
+        <h3 data-i18n="cc_params">Paramètres</h3>
+        <div class="calc-field">
+          <label class="calc-label" data-i18n="cc_pays">Pays</label>
+          <select class="calc-input" id="calcPays" onchange="updateCalcInfo()">
+            <option value="senegal">🇸🇳 Sénégal</option>
+            <option value="cotedivoire">🇨🇮 Côte d'Ivoire</option>
+            <option value="cameroun">🇨🇲 Cameroun</option>
+            <option value="rdc">🇨🇩 RD Congo</option>
+            <option value="mali">🇲🇱 Mali</option>
+            <option value="burkina">🇧🇫 Burkina Faso</option>
+            <option value="togo">🇹🇬 Togo</option>
+            <option value="gabon">🇬🇦 Gabon</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <label class="calc-label" data-i18n="cc_salaire">Salaire brut mensuel (F CFA)</label>
+          <input type="number" class="calc-input" id="calcSalaire" placeholder="Ex: 150000" min="0" oninput="calcCharges()">
+        </div>
+        <div class="calc-field">
+          <label class="calc-label" data-i18n="cc_categorie">Catégorie professionnelle</label>
+          <select class="calc-input" id="calcCategorie" onchange="calcCharges()">
+            <option value="ouvrier">Ouvrier / Employé</option>
+            <option value="agent_maitrise">Agent de maîtrise</option>
+            <option value="cadre">Cadre</option>
+          </select>
+        </div>
+        <div id="calcInfoBox" style="background:var(--gold-pale);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:11.5px;color:var(--text-muted);margin-top:0.5rem;line-height:1.6;"></div>
+      </div>
+      <div class="calc-card" style="background:var(--green-deep);border-color:transparent;">
+        <h3 style="color:var(--gold)" data-i18n="cc_result">Résultat de la simulation</h3>
+        <div id="calcResult"><div class="r-empty" data-i18n="cc_empty">Saisissez un salaire brut pour voir le résultat</div></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-top:1rem;">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.75rem;" data-i18n="cc_disclaimer_title">⚠️ Informations importantes</div>
+      <p style="font-size:12px;color:var(--text-muted);line-height:1.7;" data-i18n="cc_disclaimer_text">Les taux affichés sont des estimations moyennes basées sur les barèmes OHADA en vigueur. Les taux exacts varient selon les conventions collectives, les régimes spéciaux et les réformes récentes de chaque pays. Consultez la CNSS/INPS/IPRES de votre pays pour les taux officiels actualisés. Ce calculateur est fourni à titre informatif uniquement.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TAB GESTION -->
+<div class="content" id="tab-gestion" style="overflow-y:auto;">
+  <div class="panel">
+    <div class="panel-title">📊 <span data-i18n="ge_title">Gérer mon entreprise</span></div>
+    <div class="panel-sub" data-i18n="ge_sub">Outils pratiques pour TPE, PME et artisans — comptabilité, travail, fiscalité, financement.</div>
+    <div class="modules-grid">
+      <div class="module-card" onclick="showModule('compta')"><div class="mc-icon">📒</div><div class="mc-title" data-i18n="mod_compta">Comptabilité SYSCOHADA</div><div class="mc-desc" data-i18n="mod_compta_d">Obligations, livres légaux, seuils TPE/PME</div><span class="mc-tag">SYSCOHADA révisé</span></div>
+      <div class="module-card" onclick="showModule('travail')"><div class="mc-icon">👷</div><div class="mc-title" data-i18n="mod_travail">Droit du travail</div><div class="mc-desc" data-i18n="mod_travail_d">Contrats, congés, licenciement, cotisations</div><span class="mc-tag">AU Travail</span></div>
+      <div class="module-card" onclick="showModule('fiscalite')"><div class="mc-icon">🧾</div><div class="mc-title" data-i18n="mod_fisc">Fiscalité entreprise</div><div class="mc-desc" data-i18n="mod_fisc_d">IS, TVA, patente, obligations déclaratives</div><span class="mc-tag">Droit fiscal</span></div>
+      <div class="module-card" onclick="showModule('obligations')"><div class="mc-icon">📅</div><div class="mc-title" data-i18n="mod_obl">Calendrier obligations</div><div class="mc-desc" data-i18n="mod_obl_d">Déclarations mensuelles, annuelles</div><span class="mc-tag">Rappels légaux</span></div>
+      <div class="module-card" onclick="showModule('financement')"><div class="mc-icon">🏦</div><div class="mc-title" data-i18n="mod_fin">Financement</div><div class="mc-desc" data-i18n="mod_fin_d">Microfinance, fonds publics, investisseurs</div><span class="mc-tag">Levée de fonds</span></div>
+      <div class="module-card" onclick="showModule('suretes')"><div class="mc-icon">🔐</div><div class="mc-title" data-i18n="mod_sur">Sûretés & Garanties</div><div class="mc-desc" data-i18n="mod_sur_d">Nantissement, hypothèque, caution</div><span class="mc-tag">AUS OHADA</span></div>
+    </div>
+    <div id="moduleContent" style="display:none"></div>
+  </div>
+</div>
+
+<!-- TAB DOCUMENTS -->
+<div class="content" id="tab-documents" style="overflow-y:auto;">
+  <div class="panel">
+    <div class="panel-title">📄 <span data-i18n="doc_title">Modèles de documents juridiques</span></div>
+    <div class="panel-sub" data-i18n="doc_sub">Documents conformes au droit OHADA, à personnaliser. Consultez un juriste pour les cas complexes.</div>
+    <div class="docs-grid">
+      <div class="doc-card"><div class="doc-icon">📜</div><div class="doc-title" data-i18n="d_sarl">Statuts SARL</div><div class="doc-desc" data-i18n="d_sarl_d">Modèle complet conforme AUDSCGIE</div><div class="doc-tags"><span class="doc-tag">SARL</span><span class="doc-tag">OHADA</span></div><button class="doc-btn" onclick="openDoc('sarl')">📋 <span data-i18n="d_voir">Voir le modèle</span></button></div>
+      <div class="doc-card"><div class="doc-icon">🤝</div><div class="doc-title" data-i18n="d_gie">Statuts GIE</div><div class="doc-desc" data-i18n="d_gie_d">Idéal pour artisans, sans capital minimum</div><div class="doc-tags"><span class="doc-tag">GIE</span><span class="doc-tag">Artisans</span></div><button class="doc-btn" onclick="openDoc('gie')">📋 <span data-i18n="d_voir">Voir le modèle</span></button></div>
+      <div class="doc-card"><div class="doc-icon">📋</div><div class="doc-title" data-i18n="d_cdi">Contrat CDI</div><div class="doc-desc" data-i18n="d_cdi_d">Contrat durée indéterminée OHADA</div><div class="doc-tags"><span class="doc-tag">RH</span><span class="doc-tag">Travail</span></div><button class="doc-btn" onclick="openDoc('cdi')">📋 <span data-i18n="d_voir">Voir le modèle</span></button></div>
+      <div class="doc-card"><div class="doc-icon">⏱️</div><div class="doc-title" data-i18n="d_cdd">Contrat CDD</div><div class="doc-desc" data-i18n="d_cdd_d">Durée déterminée, motifs légaux</div><div class="doc-tags"><span class="doc-tag">RH</span><span class="doc-tag">Travail</span></div><button class="doc-btn" onclick="openDoc('cdd')">📋 <span data-i18n="d_voir">Voir le modèle</span></button></div>
+      <div class="doc-card"><div class="doc-icon">🛒</div><div class="doc-title" data-i18n="d_vente">Contrat de vente</div><div class="doc-desc" data-i18n="d_vente_d">Vente commerciale B2B conforme OHADA</div><div class="doc-tags"><span class="doc-tag">Commercial</span></div><button class="doc-btn" onclick="openDoc('vente')">📋 <span data-i18n="d_voir">Voir le modèle</span></button></div>
+      <div class="doc-card"><div class="doc-icon">🔧</div><div class="doc-title" data-i18n="d_prest">Prestation de service</div><div class="doc-desc" data-i18n="d_prest_d">Artisans, consultants, prestataires</div><div class="doc-tags"><span class="doc-tag">Artisans</span><span class="doc-tag">Services</span></div><button class="doc-btn" onclick="openDoc('prestation')">📋 <span data-i18n="d_voir">Voir le modèle</span></button></div>
+      <div class="doc-card"><div class="doc-icon">🏠</div><div class="doc-title" data-i18n="d_bail">Bail commercial</div><div class="doc-desc" data-i18n="d_bail_d">Location local commercial, droit OHADA</div><div class="doc-tags"><span class="doc-tag">Immobilier</span></div><button class="doc-btn" onclick="openDoc('bail')">📋 <span data-i18n="d_voir">Voir le modèle</span></button></div>
+      <div class="doc-card"><div class="doc-icon">📧</div><div class="doc-title" data-i18n="d_msd">Mise en demeure</div><div class="doc-desc" data-i18n="d_msd_d">Recouvrement créances, procédure OHADA</div><div class="doc-tags"><span class="doc-tag">Recouvrement</span></div><button class="doc-btn" onclick="openDoc('miseendemeure')">📋 <span data-i18n="d_voir">Voir le modèle</span></button></div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- TAB BUSINESS PLAN -->
+<div class="content" id="tab-businessplan" style="overflow-y:auto;">
+  <div class="panel">
+    <div class="panel-title">📊 Générateur de Business Plan IA</div>
+    <div class="panel-sub">Décrivez votre projet et l'IA génère un business plan structuré en quelques secondes.</div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+          <label class="calc-label">Nom du projet</label>
+          <input type="text" class="calc-input" id="bp_nom" placeholder="Ex: Boulangerie Moderne Dakar">
+        </div>
+        <div>
+          <label class="calc-label">Secteur d'activité</label>
+          <select class="calc-input" id="bp_secteur">
+            <option>Agro-alimentaire</option>
+            <option>Commerce / Distribution</option>
+            <option>Services / Conseil</option>
+            <option>Artisanat / Métiers</option>
+            <option>Transport / Logistique</option>
+            <option>Santé / Bien-être</option>
+            <option>Éducation / Formation</option>
+            <option>Tech / Numérique</option>
+            <option>BTP / Construction</option>
+            <option>Tourisme / Hôtellerie</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Pays cible</label>
+          <select class="calc-input" id="bp_pays">
+            <option>Sénégal</option>
+            <option>Côte d'Ivoire</option>
+            <option>Cameroun</option>
+            <option>RD Congo</option>
+            <option>Mali</option>
+            <option>Burkina Faso</option>
+            <option>Togo</option>
+            <option>Congo-Brazzaville</option>
+            <option>Bénin</option>
+            <option>Niger</option>
+            <option>Tchad</option>
+            <option>Gabon</option>
+            <option>Guinée</option>
+          </select>
+        </div>
+        <div>
+          <label class="calc-label">Investissement initial estimé</label>
+          <select class="calc-input" id="bp_invest">
+            <option>Moins de 500 000 F CFA</option>
+            <option>500 000 – 2 000 000 F CFA</option>
+            <option>2 000 000 – 10 000 000 F CFA</option>
+            <option>Plus de 10 000 000 F CFA</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <label class="calc-label">Description du projet (2-3 phrases)</label>
+        <textarea class="calc-input" id="bp_desc" rows="3" placeholder="Ex: Je veux ouvrir une boulangerie moderne qui propose du pain artisanal et des viennoiseries dans le quartier Plateau à Dakar. Ma clientèle cible est la classe moyenne et les expatriés. Je veux me différencier par la qualité et la livraison à domicile." style="resize:vertical;max-height:none;"></textarea>
+      </div>
+      <button class="calc-btn" id="bp_btn" onclick="generateBP()">🚀 Générer mon Business Plan</button>
+    </div>
+    <div id="bp_result" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.875rem;">
+        <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:var(--green-deep);">📄 Votre Business Plan</div>
+        <button onclick="downloadBP()" style="padding:7px 14px;background:var(--green-deep);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;">⬇️ Télécharger</button>
+      </div>
+      <div id="bp_content" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;font-size:13px;line-height:1.8;color:var(--text-main);white-space:pre-wrap;"></div>
+    </div>
+    <div id="bp_loading" style="display:none;text-align:center;padding:2rem;">
+      <div style="display:flex;gap:5px;justify-content:center;margin-bottom:1rem;">
+        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);">Génération du business plan en cours…</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="docModal">
+  <div class="modal">
+    <div class="modal-header"><h2 id="modalTitle">Modèle</h2><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body"><pre id="modalContent"></pre></div>
+    <div class="modal-footer">
+      <button class="btn-copy" onclick="copyDoc()">📋 <span data-i18n="d_copier">Copier</span></button>
+      <button class="btn-dl" onclick="downloadDoc()">⬇️ <span data-i18n="d_dl">Télécharger</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== I18N =====
+const currentLang = {v:'fr'};
+const i18n = {
+  fr: {
+    tab_chat:'💬 Conseiller IA', tab_wizard:'🧭 Créer mon entreprise', tab_checklist:'✅ Checklist pays',
+    tab_guichets:'🏛️ Guichets officiels', tab_calcul:'🧮 Charges sociales', tab_gestion:'📊 Gestion', tab_documents:'📄 Documents',
+    welcome_title:'Bonjour, je suis votre conseiller OHADA ✨',
+    welcome_sub:'Je guide TPE, PME et artisans dans la création et la gestion d\'entreprise en zone OHADA.',
+    chat_placeholder:'Posez votre question juridique ou entrepreneuriale…',
+    chat_footer:'Droit OHADA · Conseiller IA · Orientation de premier niveau',
+    cc_title:'Calculateur de charges sociales', cc_sub:'Estimez le coût total employeur et le salaire net.',
+    cc_params:'Paramètres', cc_pays:'Pays', cc_salaire:'Salaire brut mensuel (F CFA)', cc_categorie:'Catégorie professionnelle',
+    cc_result:'Résultat de la simulation', cc_empty:'Saisissez un salaire brut pour voir le résultat',
+    cc_disclaimer_title:'⚠️ Informations importantes',
+    cc_disclaimer_text:'Les taux sont des estimations moyennes. Consultez la CNSS de votre pays pour les taux officiels.',
+    gu_title:'Guichets uniques officiels', gu_sub:'Liens directs vers les organismes officiels de création d\'entreprise.',
+    disc_title:'⚠️ Avertissement', disc_text:'Orientation de premier niveau. Ne remplace pas un juriste qualifié.',
+    btn_next:'Suivant →', btn_prev:'← Retour', btn_result:'Voir mon plan →',
+    wiz_title:'🧭 Créer mon entreprise', wiz_sub:'Répondez à 5 questions pour un plan d\'action personnalisé.',
+    wiz_s1:'Profil', wiz_s2:'Secteur', wiz_s3:'Associés', wiz_s4:'Capital', wiz_s5:'Pays',
+    wq1:'Quel type d\'entrepreneur êtes-vous ?', wq2:'Quelle est l\'ambition de votre projet ?',
+    wq3:'Êtes-vous seul·e ou avec des associés ?', wq4:'Quel capital pouvez-vous mobiliser ?', wq5:'Dans quel pays créez-vous votre entreprise ?',
+    d_voir:'Voir le modèle', d_copier:'Copier', d_dl:'Télécharger',
+    cl_title:'Checklist de création par pays', cl_sub:'Sélectionnez votre pays pour la liste des démarches.',
+    qp_artisan:'Je suis artisan', qp_employe:'Premier employé', qp_taxes:'Mes taxes', qp_litige:'Litige commercial',
+    system_prompt:`Tu es un conseiller juridique expert en droit OHADA spécialisé dans l'accompagnement des TPE, PME et artisans africains. Réponds en français, ton professionnel mais accessible. Structure tes réponses clairement. Cite les textes OHADA. Termine par un disclaimer. 150-300 mots. Utilise **gras** pour les termes juridiques.`
+  },
+  wo: {
+    tab_chat:'💬 Jëfandikoo IA', tab_wizard:'🧭 Bind nit bu njëkk', tab_checklist:'✅ Liste bu dëkk',
+    tab_guichets:'🏛️ Biró yu officiel', tab_calcul:'🧮 Jëfandikoo cotisations', tab_gestion:'📊 Wér sa bopp', tab_documents:'📄 Papier yu juridik',
+    welcome_title:'Bonsoir, maa ngi seddoo ak yéen ci droit OHADA ✨',
+    welcome_sub:'Damay dimbal TPE, PME ak artisan yi ci yokk ak géer entreprise yi ci dëkk yi 17 bu OHADA.',
+    chat_placeholder:'Laaj sa laaj ci droit walla ci entreprise…',
+    chat_footer:'Droit OHADA · IA · Orientation wérsek ak droit',
+    gu_title:'Biró yu officiel', gu_sub:'Lien direkt yi vers biró yi officiel ci dëkk.',
+    disc_title:'⚠️ Tënk', disc_text:'Orientation wérsek rekk. Du jubël ay juriste bu dëgëër.',
+    btn_next:'Kanam →', btn_prev:'← Dellu', btn_result:'Xool sa plan →',
+    wiz_title:'🧭 Sos sa entreprise', wiz_sub:'Tontu laaj yi 5 pour am sa plan d\'action.',
+    wiz_s1:'Profil', wiz_s2:'Secteur', wiz_s3:'Associés', wiz_s4:'Capital', wiz_s5:'Dëkk',
+    wq1:'Ana sa profil ci entreprise?', wq2:'Lu may dem ci sa projet?',
+    wq3:'Ndax yow rekk walla am ak yeneen?', wq4:'Bari na na sa capital?', wq5:'Ci fan dëkk dafay sos sa entreprise?',
+    d_voir:'Xool modèle bi', d_copier:'Copy', d_dl:'Télécharger',
+    cl_title:'Liste bu dëkk', cl_sub:'Tann sa dëkk pour am liste yu démarches yi.',
+    qp_artisan:'Maa artisan', qp_employe:'Jëkëram salaire bi', qp_taxes:'Taxes yam', qp_litige:'Problème commercial',
+    cc_title:'Jëfandikoo cotisations sociales', cc_sub:'Jàng na cotisations yi ci sa dëkk.',
+    cc_params:'Paramètres', cc_pays:'Dëkk', cc_salaire:'Salaire brut bu weeru (F CFA)', cc_categorie:'Catégorie',
+    cc_result:'Résultat', cc_empty:'Bind salaire brut ci biiru xool résultat bi',
+    cc_disclaimer_title:'⚠️ Xibaar yu amul solo', cc_disclaimer_text:'Taux yi dañu moyenne. Laaj CNSS sa dëkk pour taux yu officiel yi.',
+    system_prompt:`Yow ci droit OHADA expert, jëfandikoo ci wolof, jubël ak accessible. Xool texte OHADA. Terminer ak disclaimer. Bind **gras** pour terme juridique yi importants.`
+  },
+  bm: {
+    tab_chat:'💬 IA Kunnafoni', tab_wizard:'🧭 N ka baara dɔ dilan', tab_checklist:'✅ Liste ka jamana',
+    tab_guichets:'🏛️ Sababu ɲɛnamaya', tab_calcul:'🧮 Cotisation jate', tab_gestion:'📊 Baara jateminɛ', tab_documents:'📄 Sɛbɛn juridike',
+    welcome_title:'Aw ni ce! Ne ye i ka kunnafonibaga ye OHADA la ✨',
+    welcome_sub:'Ne b\'a dɛmɛ TPE, PME ni bangefuranan kɛlaw ka baara dilan ni jateminɛ OHADA jamana 17 la.',
+    chat_placeholder:'I ka ɲininkali fɔ droit walla baara la…',
+    chat_footer:'Droit OHADA · IA · Kunnafonibaga fɔlɔ',
+    gu_title:'Sababu ɲɛnamaya', gu_sub:'Sɛbɛn ɲɛnamaya ye jamana fɔlɔla.',
+    disc_title:'⚠️ Kunnafoni', disc_text:'Kunnafonibaga fɔlɔ dɔrɔn. O tɛ juriste ye.',
+    btn_next:'Kɔrɔ taa →', btn_prev:'← Kɔsegin', btn_result:'I ka plan ye →',
+    wiz_title:'🧭 N ka baara dɔ dilan', wiz_sub:'Ɲininkali 5 jaabi ka bɛn i ka plan la.',
+    wiz_s1:'Profil', wiz_s2:'Secteur', wiz_s3:'Sigidɔnkɛlaw', wiz_s4:'Capital', wiz_s5:'Jamana',
+    wq1:'I ye jɔn ye baara la?', wq2:'I ka projet bɛ min nɔɔrɔ?',
+    wq3:'I ka kɛ i kelen dɔrɔn wala ni sigidɔnkɛlaw?', wq4:'I bɛ joli capital sɔrɔ?', wq5:'Jamana jɔlen de la i bɛna baara dilan?',
+    d_voir:'Modèle ye', d_copier:'Copie kɛ', d_dl:'Bɔsi',
+    cl_title:'Jamana ta liste', cl_sub:'I ka jamana sugandi ka sɛbɛnw ye.',
+    qp_artisan:'Ne ye bangefuranan ye', qp_employe:'Baarakɛla fɔlɔ', qp_taxes:'N ka taxes', qp_litige:'Baara kɛnyɛfali',
+    cc_title:'Cotisations sociales jate', cc_sub:'Jamana bɛ cotisations dɔ jatɛmɛnɛ.',
+    cc_params:'Paramètres', cc_pays:'Jamana', cc_salaire:'Salaire brut kalo kelen (F CFA)', cc_categorie:'Catégorie',
+    cc_result:'Jaabi', cc_empty:'Salaire brut sɛbɛn ka jaabi ye',
+    cc_disclaimer_title:'⚠️ Kunnafoni nafama', cc_disclaimer_text:'Taux nunu ye mɔgɔ caman ta ye. Sɛgɛsɛgɛ CNSS i ka jamana la.',
+    system_prompt:`I ye juriste ye droit OHADA la, bambara kɛ, accessible. Texte OHADA dɔw fɔ. Disclaimer fɔ. **Gras** juridike kumaw la.`
+  },
+  ln: {
+    tab_chat:'💬 IA Teyamba', tab_wizard:'🧭 Bongisa mosala na ngai', tab_checklist:'✅ Liste na ekolo',
+    tab_guichets:'🏛️ Biro ya ofisye', tab_calcul:'🧮 Kotiya cotisations', tab_gestion:'📊 Kobatela mosala', tab_documents:'📄 Sango ya droit',
+    welcome_title:'Mbote! Nazali moteyi na yo na droit OHADA ✨',
+    welcome_sub:'Nazali kosalisa TPE, PME na baartisans na kotinda mpe kobatela mosala na ekolo 17 ya OHADA.',
+    chat_placeholder:'Tuna motuna na yo ya droit to mosala…',
+    chat_footer:'Droit OHADA · IA · Teyamba ya liboso',
+    gu_title:'Biro ya ofisye', gu_sub:'Bozweli ya tiyéli ya biro ya ofisye.',
+    disc_title:'⚠️ Litatoli', disc_text:'Teyamba ya liboso kaka. Ezali te kolongola juriste.',
+    btn_next:'Liboso →', btn_prev:'← Kozonga', btn_result:'Tala plan na yo →',
+    wiz_title:'🧭 Bongisa mosala na ngai', wiz_sub:'Eyano na mituna 5 mpo na plan ya bopesami.',
+    wiz_s1:'Profil', wiz_s2:'Secteur', wiz_s3:'Baasosye', wiz_s4:'Capital', wiz_s5:'Ekolo',
+    wq1:'Yo ozali nani na mosala?', wq2:'Bolingo ya projet na yo ezali nini?',
+    wq3:'Ozali wana yo moko to na baasosye?', wq4:'Capital ya ndenge nini okoki kozwa?', wq5:'Na ekolo nini okotyela mosala na yo?',
+    d_voir:'Tala modèle', d_copier:'Kokopi', d_dl:'Kokitisa',
+    cl_title:'Liste na ekolo', cl_sub:'Pona ekolo na yo mpo na tala malamu ya kosala.',
+    qp_artisan:'Nazali artisan', qp_employe:'Mosali ya liboso', qp_taxes:'Taxes na ngai', qp_litige:'Bitumba ya mosala',
+    cc_title:'Kotiya cotisations sociales', cc_sub:'Kotiya charges na ekolo na yo.',
+    cc_params:'Paramètres', cc_pays:'Ekolo', cc_salaire:'Salaire brut ya sanza (F CFA)', cc_categorie:'Catégorie',
+    cc_result:'Okonisi', cc_empty:'Tia salaire brut mpo na kotala okonisi',
+    cc_disclaimer_title:'⚠️ Boyebisi ya ntina', cc_disclaimer_text:'Taux ezali makitamisi ya motuya. Tuna CNSS na ekolo na yo.',
+    system_prompt:`Ozali juriste expert na droit OHADA, lingala, accessible. Sango ya OHADA. Disclaimer. **Gras** mpo na maboko ya droit.`
+  },
+  en: {
+    tab_chat:'💬 AI Advisor', tab_wizard:'🧭 Start my business', tab_checklist:'✅ Country checklist',
+    tab_guichets:'🏛️ Official agencies', tab_calcul:'🧮 Social charges', tab_gestion:'📊 Management', tab_documents:'📄 Legal templates',
+    welcome_title:'Hello, I am your OHADA legal advisor ✨',
+    welcome_sub:'I guide SMEs and artisans through business creation and management in the OHADA zone — 17 countries.',
+    chat_placeholder:'Ask your legal or business question…',
+    chat_footer:'OHADA Law · AI Advisor · First-level guidance',
+    gu_title:'Official one-stop shops', gu_sub:'Direct links to official business registration agencies per country.',
+    disc_title:'⚠️ Disclaimer', disc_text:'First-level guidance only. Does not replace a qualified lawyer.',
+    btn_next:'Next →', btn_prev:'← Back', btn_result:'See my plan →',
+    wiz_title:'🧭 Start my business', wiz_sub:'Answer 5 questions for a personalised action plan.',
+    wiz_s1:'Profile', wiz_s2:'Sector', wiz_s3:'Partners', wiz_s4:'Capital', wiz_s5:'Country',
+    wq1:'What type of entrepreneur are you?', wq2:'What is the ambition of your project?',
+    wq3:'Are you alone or with partners?', wq4:'How much capital can you mobilise?', wq5:'In which country will you register?',
+    d_voir:'View template', d_copier:'Copy', d_dl:'Download',
+    cl_title:'Creation checklist by country', cl_sub:'Select your country for the complete list of steps.',
+    qp_artisan:'I am a craftsman', qp_employe:'First employee', qp_taxes:'My taxes', qp_litige:'Commercial dispute',
+    cc_title:'Social charges calculator', cc_sub:'Estimate the total employer cost and net salary by country.',
+    cc_params:'Parameters', cc_pays:'Country', cc_salaire:'Monthly gross salary (F CFA)', cc_categorie:'Professional category',
+    cc_result:'Simulation result', cc_empty:'Enter a gross salary to see the result',
+    cc_disclaimer_title:'⚠️ Important information', cc_disclaimer_text:'Rates are average estimates. Check your country\'s official CNSS for exact rates.',
+    system_prompt:`You are an expert legal advisor in OHADA law. Answer in English, professional but accessible. Cite OHADA texts. End with a disclaimer. 150-300 words. Use **bold** for legal terms.`
+  }
+};
+
+function setLang(lang) {
+  currentLang.v = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  const t = i18n[lang] || i18n.fr;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if(t[k]) el.textContent = t[k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const k = el.getAttribute('data-i18n-ph');
+    if(t[k]) el.placeholder = t[k];
+  });
+}
+
+// ===== TAB NAV =====
+function showTab(name) {
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const names = ['chat','wizard','checklist','guichets','calcul','gestion','documents','businessplan'];
+  const tabs = document.querySelectorAll('.nav-tab');
+  const idx = names.indexOf(name);
+  if(idx>=0) tabs[idx].classList.add('active');
+  if(name==='checklist') loadChecklist('senegal', document.querySelector('.country-pill'));
+  if(name==='guichets') renderGuichets();
+  if(name==='calcul') updateCalcInfo();
+}
+
+// ===== CHAT =====
+let history=[],isLoading=false,APIKEY='',freeQuestions=0,MAX_FREE=3,selectedPlan='mensuel';
+const PROXY_URL='/api/chat';
+
+function resetApiKey(){
+  try{ localStorage.removeItem('ohada_key'); } catch(e){}
+  APIKEY = '';
+  document.getElementById('apikeyInput').value = '';
+  document.getElementById('apikeyModal').style.display = 'flex';
+}
+
+function saveApiKey(){
+  var inp = document.getElementById('apikeyInput');
+  var k = inp ? inp.value.trim() : '';
+  if(!k){ alert('Veuillez entrer votre clé API.'); return; }
+  APIKEY = k;
+  try{ localStorage.setItem('ohada_key', k); } catch(e){}
+  var modal = document.getElementById('apikeyModal');
+  if(modal) modal.style.display = 'none';
+}
+// DOMContentLoaded handled in payment section
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
+function askChat(q){showTab('chat');setTimeout(()=>{document.getElementById('chatInput').value=q;sendMessage();},100);}
+function addMsg(role,content){
+  const box=document.getElementById('messages');
+  const row=document.createElement('div');row.className=`msg-row ${role}`;
+  const av=document.createElement('div');av.className=`avatar ${role}`;av.textContent=role==='ai'?'⚖':'V';
+  const bub=document.createElement('div');bub.className=`bubble ${role}`;
+  if(role==='ai')bub.innerHTML=fmtMsg(content);else bub.textContent=content;
+  row.appendChild(av);row.appendChild(bub);box.appendChild(row);box.scrollTop=box.scrollHeight;
+}
+function fmtMsg(t){
+  return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs,m=>`<ul>${m}</ul>`)
+    .replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')
+    .replace(/^(.+)$/,'<p>$1</p>');
+}
+function showTyping(){
+  const box=document.getElementById('messages');
+  const row=document.createElement('div');row.className='msg-row ai';row.id='typing-row';
+  const av=document.createElement('div');av.className='avatar ai';av.textContent='⚖';
+  const tb=document.createElement('div');tb.className='typing-bubble';
+  tb.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  row.appendChild(av);row.appendChild(tb);box.appendChild(row);box.scrollTop=box.scrollHeight;
+}
+function hideTyping(){const e=document.getElementById('typing-row');if(e)e.remove();}
+
+async function sendMessage(){
+  if(isLoading)return;
+  if(!APIKEY){document.getElementById('apikeyModal').style.display='flex';return;}
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';inp.style.height='auto';
+  isLoading=true;document.getElementById('sendBtn').disabled=true;
+  addMsg('user',text);history.push({role:'user',content:text});showTyping();
+  const sysPrompt = (i18n[currentLang.v]||i18n.fr).system_prompt || i18n.fr.system_prompt;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json','x-api-key':APIKEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:sysPrompt,messages:history})
+    });
+    const data=await res.json();hideTyping();
+    var reply;
+    if(data.error){
+      reply = "⚠️ Erreur API : "+data.error.message+". Cliquez sur 🔑 Clé API pour changer votre clé.";
+    } else {
+      reply = (data.content&&data.content[0]&&data.content[0].text) ? data.content[0].text : "Désolé, réponse invalide. Vérifiez votre clé API.";
+    }
+    history.push({role:'assistant',content:reply});addMsg('ai',reply);
+    freeQuestions++;
+    const isPro2 = localStorage.getItem('ohada_pro') === 'true';
+    if(!isPro2 && freeQuestions >= MAX_FREE){
+      setTimeout(()=>{
+        addMsg('ai','💡 Vous avez utilisé vos **3 questions gratuites**. Abonnez-vous pour un accès illimité !');
+        setTimeout(()=>{ document.getElementById('paywallModal').style.display='flex'; }, 1500);
+      }, 500);
+    }
+  }catch(e){
+    hideTyping();
+    if(!APIKEY){
+      addMsg('ai',"⚠️ Clé API manquante. Cliquez sur 🔑 Clé API en haut à droite.");
+    } else {
+      addMsg('ai',"⚠️ Erreur : "+e.message+". Vérifiez votre clé API en cliquant sur 🔑 en haut à droite.");
+    }
+  }
+  isLoading=false;document.getElementById('sendBtn').disabled=false;inp.focus();
+}
+
+// ===== WIZARD =====
+const wAnswers={};
+function selectOpt(el,key,val){
+  el.closest('.wizard-options').querySelectorAll('.w-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');wAnswers[key]=val;
+  const m={profil:'w1next',ambition:'w2next',associes:'w3next',capital:'w4next',pays:'w5next'};
+  if(m[key])document.getElementById(m[key]).disabled=false;
+}
+function goStep(n){
+  for(let i=1;i<=5;i++){const s=document.getElementById('wstep'+i);if(s)s.style.display=i===n?'block':'none';}
+  updateWizProgress(n);
+}
+function updateWizProgress(current){
+  for(let i=1;i<=5;i++){
+    const c=document.getElementById('wc'+i),l=document.getElementById('wl'+i);
+    if(i<current){c.className='wp-circle done';c.textContent='✓';if(l)l.classList.add('done');}
+    else if(i===current){c.className='wp-circle active';c.textContent=i;}
+    else{c.className='wp-circle';c.textContent=i;if(l)l.classList.remove('done');}
+  }
+}
+const statutMap={seul:{micro:'Entreprise Individuelle',tpe:'SARL unipersonnelle',startup:'SAS unipersonnelle'},'2-3':{micro:'GIE simplifié',tpe:'SARL',startup:'SAS'},'4+':{micro:'GIE',tpe:'Société Coopérative',startup:'SA'}};
+const paysLabels={senegal:'Sénégal',congo:'Congo-Brazzaville',benin:'Bénin',niger:'Niger',tchad:'Tchad',guinee:'Guinée',cotedivoire:"Côte d'Ivoire",cameroun:'Cameroun',rdc:'RD Congo',mali:'Mali',burkina:'Burkina Faso',togo:'Togo',autre:'Pays OHADA'};
+const paysGuichet={senegal:'APIX / Guichet RCCM',congo:'ANACI Brazzaville',benin:'APIEX Bénin',niger:'CEFORE Niger',tchad:'ONAPE / Guichet Unique',guinee:'APIP-Guinea',cotedivoire:'CEPICI',cameroun:'CFCE',rdc:'ANAPI',mali:'API Mali',burkina:'CEFORE / MEBF',togo:'API Togo',autre:'Guichet unique national'};
+
+function showResult(){
+  const a=wAnswers;
+  const statut=(statutMap[a.associes]||{})[a.ambition]||'SARL';
+  const pays=paysLabels[a.pays]||'votre pays';
+  const guichet=paysGuichet[a.pays]||'le guichet unique';
+  const capLabel=a.capital==='zero'?'Capital libre':a.capital==='moyen'?'100k–1M FCFA':'>1M FCFA';
+  const steps=[
+    {t:'Choisir votre forme juridique',d:`Recommandation : ${statut}`},
+    {t:'Rédiger les statuts',d:'Voir onglet Documents pour les modèles'},
+    {t:'Déposer le capital en banque',d:capLabel+' — obtenir attestation de dépôt'},
+    {t:'S\'immatriculer',d:guichet+' centralise toutes les formalités'},
+    {t:'Obtenir le numéro fiscal (NIF/IFU)',d:'Obligatoire pour facturer'},
+    {t:'Ouvrir un compte bancaire professionnel',d:'Séparer finances perso et entreprise'},
+    {t:'S\'inscrire aux organismes sociaux',d:'CNSS/IPRES pour vos futurs employés'},
+  ];
+  const html=`
+    <div class="result-card">
+      <div class="result-badge">✓ Recommandation personnalisée</div>
+      <div class="result-title">${statut}</div>
+      <div class="result-sub">Profil : ${a.profil||'—'} · Ambition : ${a.ambition||'—'} · ${pays}</div>
+      <div class="result-grid">
+        <div class="result-stat"><div class="rs-label">Pays</div><div class="rs-value">${pays}</div></div>
+        <div class="result-stat"><div class="rs-label">Capital</div><div class="rs-value">${capLabel}</div></div>
+        <div class="result-stat"><div class="rs-label">Associés</div><div class="rs-value">${a.associes==='seul'?'Solo':a.associes}</div></div>
+      </div>
+    </div>
+    <div class="wizard-card">
+      <div class="wizard-question">📋 Votre plan d'action — ${pays}</div>
+      <ul class="steps-list">${steps.map((s,i)=>`<li><div class="step-num">${i+1}</div><div class="step-body"><strong>${s.t}</strong><span>${s.d}</span></div></li>`).join('')}</ul>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:0.4rem;flex-wrap:wrap;">
+      <button class="btn-next" onclick="askChat('Explique comment créer une ${statut} en zone OHADA étape par étape')">💬 En savoir plus</button>
+      <button class="btn-prev" onclick="restartWizard()">↺ Recommencer</button>
+    </div>`;
+  for(let i=1;i<=5;i++){const s=document.getElementById('wstep'+i);if(s)s.style.display='none';}
+  document.getElementById('wresult').style.display='block';
+  document.getElementById('wresult').innerHTML=html;
+  updateWizProgress(6);
+}
+function restartWizard(){
+  Object.keys(wAnswers).forEach(k=>delete wAnswers[k]);
+  document.getElementById('wresult').style.display='none';
+  document.getElementById('wresult').innerHTML='';
+  goStep(1);
+  ['w1next','w2next','w3next','w4next','w5next'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=true;});
+  document.querySelectorAll('.w-option').forEach(o=>o.classList.remove('selected'));
+}
+
+// ===== CHECKLIST =====
+const checklistData={
+  senegal:{cout:'50 000–150 000 F CFA · Délai : 1–3 jours · APIX',sections:[
+    {title:'Documents personnels',items:[{t:'CNI ou passeport',d:'Copie légalisée'},{t:'Casier judiciaire (n°3)',d:'Moins de 3 mois'},{t:'2 photos identité',d:'Format passeport'},{t:'Justificatif domicile',d:'Facture ou certificat résidence'}]},
+    {title:'Documents entreprise',items:[{t:'Statuts signés (SARL/SA)',d:'Tous associés'},{t:'Attestation dépôt capital',d:'Banque agréée'},{t:'Nom commercial',d:'Vérifier disponibilité RCCM'},{t:'Adresse siège social',d:'Bail enregistré'}]},
+    {title:'Formalités APIX',items:[{t:'Immatriculation RCCM',d:'Via guichet unique APIX'},{t:'Obtention NINEA',d:'Numéro identification fiscale'},{t:'Déclaration fiscale',d:'Direction des Impôts'},{t:'Inscription IPRES/CSS',d:'Si employés prévus'}]},
+  ]},
+  cotedivoire:{cout:'30 000–80 000 F CFA · Délai : 24–48h · CEPICI',sections:[
+    {title:'Documents personnels',items:[{t:'CNI ou passeport',d:'Copie certifiée'},{t:'Casier judiciaire (n°3)',d:'Moins de 3 mois'},{t:'2 photos identité',d:''}]},
+    {title:'Documents entreprise',items:[{t:'Statuts notariés',d:'Obligatoire SARL/SA'},{t:'Attestation capital',d:'Banque agréée'},{t:'Siège social Côte d\'Ivoire',d:'Bail commercial enregistré'},{t:'Objet social précis',d:'Description activité'}]},
+    {title:'Démarches CEPICI',items:[{t:'Dépôt au guichet CEPICI',d:'Centre Promotion Investissements'},{t:'RCCM + IFU',d:'Délivrés simultanément'},{t:'Extrait Kbis ivoirien',d:''},{t:'Déclaration CNPS',d:'Si employés'}]},
+  ]},
+  cameroun:{cout:'40 000–120 000 F CFA · Délai : 3–5 jours · CFCE',sections:[
+    {title:'Documents personnels',items:[{t:'CNI ou passeport',d:'Original + copie certifiée'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'2 photos identité',d:''}]},
+    {title:'Documents société',items:[{t:'Statuts notariés SARL/SA',d:''},{t:'PV première AG',d:'Si pluralité associés'},{t:'Attestation capital',d:'Banque agréée'},{t:'Bail ou titre siège',d:''}]},
+    {title:'Formalités CFCE',items:[{t:'Dépôt au CFCE',d:'Centre Formalités Création'},{t:'Inscription RCCM',d:'Tribunal commerce'},{t:'NIU — Numéro impôt',d:'Direction des Impôts'},{t:'Affiliation CNPS',d:'Caisse Prévoyance Sociale'}]},
+  ]},
+  rdc:{cout:'150–300 USD · Délai : 3–10 jours · ANAPI',sections:[
+    {title:'Documents personnels',items:[{t:'Passeport ou carte identité',d:'Copie légalisée'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'Photos identité ×4',d:''},{t:'Preuve résidence',d:'Facture ou attestation'}]},
+    {title:'Documents société',items:[{t:'Statuts constitutifs notariés',d:''},{t:'Liste actionnaires et gérants',d:''},{t:'Attestation capital',d:'Banque locale agréée'},{t:'Adresse siège social RDC',d:''}]},
+    {title:'Formalités',items:[{t:'Enregistrement ANAPI',d:'Guichet unique'},{t:'Inscription RCCM',d:'Tribunal Commerce'},{t:'NIF — Numéro impôt',d:'DGI'},{t:'Inscription INSS',d:'Si employés'}]},
+  ]},
+  mali:{cout:'30 000–100 000 F CFA · Délai : 1–5 jours',sections:[
+    {title:'Documents personnels',items:[{t:'Pièce identité nationale',d:'Copie légalisée'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'Photos identité',d:''}]},
+    {title:'Documents entreprise',items:[{t:'Statuts notariés',d:'Sociétés de capitaux'},{t:'Attestation capital',d:'Banque agréée'},{t:'Justificatif siège social',d:'Bail enregistré'}]},
+    {title:'Formalités',items:[{t:'Inscription RCCM',d:'Registre Commerce'},{t:'NIF fiscal',d:'Direction Nationale Impôts'},{t:'Inscription INPS',d:'Prévoyance Sociale'},{t:'Patente professionnelle',d:'Selon secteur'}]},
+  ]},
+  burkina:{cout:'15 000–50 000 F CFA · Délai : 1–3 jours · CEFORE',sections:[
+    {title:'Documents personnels',items:[{t:'CNI ou passeport',d:'Photocopie légalisée'},{t:'Casier judiciaire n°3',d:'Moins de 3 mois'},{t:'2 photos identité',d:''},{t:'Certificat résidence',d:'Mairie ou commissariat'}]},
+    {title:'Documents entreprise',items:[{t:'Statuts signés',d:'Tous associés'},{t:'Attestation capital',d:''},{t:'Bail enregistré siège',d:''},{t:'Fiche localisation',d:'Visée par les impôts'}]},
+    {title:'Formalités CEFORE',items:[{t:'Dépôt au CEFORE',d:'Centre Formalités Entreprises'},{t:'RCCM + IFU simultanés',d:''},{t:'Carte professionnelle commerçant',d:'500 FCFA MEBF'},{t:'Déclaration CNSS',d:'Si employés'}]},
+  ]},
+  togo:{cout:'20 000–70 000 F CFA · Délai : 2–4 jours · API Togo',sections:[
+    {title:'Documents personnels',items:[{t:'Pièce identité',d:'CNI ou passeport légalisé'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'Photos récentes',d:''}]},
+    {title:'Documents société',items:[{t:'Statuts notariés',d:'SARL et SA obligatoire'},{t:'Attestation capital',d:'Banque agréée'},{t:'Bail ou attestation siège',d:''}]},
+    {title:'Formalités',items:[{t:'Guichet unique API Togo',d:'Agence Promotion Investissements'},{t:'RCCM Tribunal commerce',d:''},{t:'NIF fiscal',d:'Office Togolais Recettes'},{t:'Affiliation CNSS',d:'Si employés'}]},
+  ]},
+
+  congo:{cout:'30 000–100 000 F CFA · Délai : 3–7 jours · ANAPI Congo',sections:[
+    {title:'Documents personnels',items:[{t:'CNI ou passeport',d:'Copie légalisée'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'2 photos identité',d:'Format passeport'},{t:'Certificat de résidence',d:'Mairie ou commissariat'}]},
+    {title:'Documents entreprise',items:[{t:'Statuts notariés',d:'Obligatoire SARL/SA'},{t:'Attestation dépôt capital',d:'Banque agréée'},{t:'Adresse siège social Brazzaville',d:'Bail enregistré'},{t:'Objet social précis',d:'Description activité'}]},
+    {title:'Formalités',items:[{t:'Guichet unique ANACI',d:'Agence Nationale Appui Création Initiatives'},{t:'Immatriculation RCCM',d:'Tribunal Commerce Brazzaville'},{t:'NIF fiscal',d:'Direction Générale des Impôts'},{t:'Affiliation CNSS',d:'Caisse Nationale Sécurité Sociale'}]},
+  ]},
+  benin:{cout:'30 000–80 000 F CFA · Délai : 1–3 jours · APIEX',sections:[
+    {title:'Documents personnels',items:[{t:'CNI ou passeport',d:'Copie légalisée'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'2 photos identité',d:''},{t:'Acte de naissance',d:'Copie certifiée'}]},
+    {title:'Documents entreprise',items:[{t:'Statuts notariés',d:'SARL/SA obligatoire'},{t:'Attestation dépôt capital',d:'Banque agréée'},{t:'Bail commercial enregistré',d:'Siège social'},{t:'Objet social précis',d:'Description activité'}]},
+    {title:'Formalités APIEX',items:[{t:'Guichet unique APIEX',d:'Agence Promotion Investissements'},{t:'Immatriculation RCCM',d:'Tribunal commerce Cotonou'},{t:'Numéro IFU',d:'Identifiant Fiscal Unique'},{t:'Inscription CNSS',d:'Si employés prévus'}]},
+  ]},
+  niger:{cout:'20 000–70 000 F CFA · Délai : 2–5 jours · CEFORE',sections:[
+    {title:'Documents personnels',items:[{t:'CNI ou passeport',d:'Copie légalisée'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'2 photos identité',d:''},{t:'Certificat de résidence',d:''}]},
+    {title:'Documents entreprise',items:[{t:'Statuts signés',d:'Notariés pour SARL/SA'},{t:'Attestation capital',d:'Banque agréée'},{t:'Adresse siège social',d:'Bail enregistré'}]},
+    {title:'Formalités CEFORE',items:[{t:'CEFORE Niger',d:'Centre Formalités Entreprises'},{t:'RCCM + NIF',d:'Simultanément'},{t:'Patente professionnelle',d:'Selon activité'},{t:'CNSS employeur',d:'Si recrutement'}]},
+  ]},
+  tchad:{cout:'50 000–150 000 F CFA · Délai : 5–10 jours',sections:[
+    {title:'Documents personnels',items:[{t:'Passeport ou CNI',d:'Copie légalisée'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'Photos identité',d:''},{t:'Preuve domicile',d:''}]},
+    {title:'Documents entreprise',items:[{t:'Statuts notariés',d:''},{t:'Attestation capital',d:'Banque agréée'},{t:'Siège social à N-Djamena',d:''}]},
+    {title:'Formalités',items:[{t:'Guichet unique ONAPE',d:''},{t:'RCCM Tribunal commerce',d:''},{t:'NIF fiscal',d:'Direction des Impôts'},{t:'CNSS',d:'Si employés'}]},
+  ]},
+  guinee:{cout:'USD 50–150 · Délai : 3–7 jours · APIP',sections:[
+    {title:'Documents personnels',items:[{t:'Passeport ou carte identité',d:'Copie légalisée'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'Photos identité',d:''},{t:'Résidence en Guinée',d:'Attestation ou bail'}]},
+    {title:'Documents entreprise',items:[{t:'Statuts notariés',d:''},{t:'Attestation capital',d:'Banque agréée'},{t:'Adresse siège social Conakry',d:''}]},
+    {title:'Formalités APIP',items:[{t:'Guichet APIP-Guinea',d:'Agence Promotion Investissements'},{t:'RCCM',d:'Tribunal commerce'},{t:'NIF fiscal',d:'Direction des Impôts'},{t:'CNSS Guinée',d:'Si employés'}]},
+  ]},  gabon:{cout:'50 000–200 000 F CFA · Délai : 3–7 jours',sections:[
+    {title:'Documents personnels',items:[{t:'Passeport ou carte nationale',d:'Copie légalisée'},{t:'Casier judiciaire',d:'Moins de 3 mois'},{t:'Photos identité',d:''}]},
+    {title:'Documents société',items:[{t:'Statuts notariés',d:''},{t:'Attestation dépôt capital',d:''},{t:'Justificatif siège social',d:''}]},
+    {title:'Formalités',items:[{t:'Centre Formalités Entreprises (CFE)',d:''},{t:'Immatriculation RCCM',d:''},{t:'Numéro contribuable',d:'DGI'},{t:'CNSS sécurité sociale',d:''}]},
+  ]},
+};
+let clChecked={};
+function loadChecklist(pays,btn){
+  document.querySelectorAll('.country-pill').forEach(p=>p.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  clChecked={};
+  const data=checklistData[pays];if(!data)return;
+  document.getElementById('clCostInfo').innerHTML=`<div class="cl-cost-info"><div class="cl-cost-icon">💡</div><div class="cl-cost-text"><strong>Coût et délai estimés</strong><span>${data.cout}</span></div></div>`;
+  let html='',totalItems=0;
+  data.sections.forEach((sec,si)=>{
+    html+=`<div class="checklist-section" style="margin-bottom:1rem"><div class="cl-section-title">${sec.title}</div>`;
+    sec.items.forEach((item,ii)=>{const id=`cl-${si}-${ii}`;totalItems++;html+=`<div class="cl-item" id="${id}" onclick="toggleCheck('${id}','${pays}')"><div class="cl-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg></div><div class="cl-text"><strong>${item.t}</strong><span>${item.d}</span></div></div>`;});
+    html+='</div>';
+  });
+  document.getElementById('checklistContent').innerHTML=html;
+  updateClProgress(pays);
+}
+function toggleCheck(id,pays){const el=document.getElementById(id);if(!el)return;el.classList.toggle('checked');clChecked[id]=el.classList.contains('checked');updateClProgress(pays);}
+function updateClProgress(pays){
+  const data=checklistData[pays];if(!data)return;
+  let total=0,done=0;
+  data.sections.forEach((sec,si)=>sec.items.forEach((_,ii)=>{total++;if(clChecked[`cl-${si}-${ii}`])done++;}));
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('clProgressFill').style.width=pct+'%';
+  document.getElementById('clProgressLabel').textContent=`${done} / ${total} étapes complétées (${pct}%)`;
+}
+
+// ===== GUICHETS OFFICIELS =====
+const guichetsData=[
+  {flag:'🇸🇳',pays:'Sénégal',nom:'APIX — Guichet Unique',url:'https://www.apix.sn',delai:'1–3 jours',cout:'Gratuit',tags:['digital','rapide'],tel:'+221 33 849 05 55',email:'apix@apix.sn'},
+  {flag:'🇨🇮',pays:"Côte d'Ivoire",nom:'CEPICI — Centre Promotion Investissements',url:'https://www.cepici.ci',delai:'24–48h',cout:'Gratuit',tags:['digital','rapide'],tel:'+225 27 22 30 10 00',email:'info@cepici.ci'},
+  {flag:'🇨🇲',pays:'Cameroun',nom:'CFCE — Centre de Formalités',url:'https://www.cfce.cm',delai:'3–5 jours',cout:'40–120k FCFA',tags:[],tel:'+237 222 22 31 00',email:'cfce@cfce.cm'},
+  {flag:'🇨🇩',pays:'RD Congo',nom:'ANAPI — Guichet Unique',url:'https://www.anapi.cd',delai:'3–10 jours',cout:'150–300 USD',tags:[],tel:'+243 81 015 0007',email:'info@anapi.cd'},
+  {flag:'🇲🇱',pays:'Mali',nom:'API Mali — Promotion Investissements',url:'https://www.apimali.gov.ml',delai:'1–5 jours',cout:'30–100k FCFA',tags:[],tel:'+223 20 23 13 44',email:'api@apimali.gov.ml'},
+  {flag:'🇧🇫',pays:'Burkina Faso',nom:'CEFORE — Centre Formalités',url:'https://www.cefore.bf',delai:'1–3 jours',cout:'15–50k FCFA',tags:['rapide'],tel:'+226 25 30 88 88',email:'cefore@mebf.bf'},
+  {flag:'🇹🇬',pays:'Togo',nom:'API Togo — Promotion Investissements',url:'https://www.apitogo.com',delai:'2–4 jours',cout:'20–70k FCFA',tags:[],tel:'+228 22 26 60 30',email:'info@apitogo.tg'},
+  {flag:'🇬🇦',pays:'Gabon',nom:'CFE — Centre Formalités Entreprises',url:'https://www.cfe.ga',delai:'3–7 jours',cout:'50–200k FCFA',tags:[],tel:'+241 01 79 00 00',email:'cfe@cfe.ga'},
+  {flag:'🇳🇪',pays:'Niger',nom:'CEFORE Niger',url:'https://www.cefore.ne',delai:'2–5 jours',cout:'20–80k FCFA',tags:[],tel:'+227 20 73 22 07',email:''},
+  {flag:'🇹🇩',pays:'Tchad',nom:'ONAPE / Guichet Unique',url:'https://www.onape.td',delai:'5–10 jours',cout:'50–150k FCFA',tags:[],tel:'+235 22 52 05 61',email:''},
+  {flag:'🇨🇬',pays:'Congo-Brazzaville',nom:'ANACI — Agence Nationale Appui Créations',url:'https://www.anaci.cg',delai:'3–7 jours',cout:'30–100k FCFA',tags:[],tel:'+242 06 676 00 00',email:''},
+  {flag:'🇧🇯',pays:'Bénin',nom:'APIEX — Guichet Unique',url:'https://www.apiex.bj',delai:'1–3 jours',cout:'30–80k FCFA',tags:['rapide'],tel:'+229 21 30 74 00',email:''},
+  {flag:'🇬🇳',pays:'Guinée',nom:'APIP-Guinea',url:'https://www.apip.gov.gn',delai:'3–7 jours',cout:'USD 50–150',tags:[],tel:'+224 622 00 00 00',email:''},
+];
+
+function renderGuichets(){
+  const rows = guichetsData.map(g => `
+    <tr>
+      <td><span class="g-flag">${g.flag}</span></td>
+      <td><span class="g-pays">${g.pays}</span><span class="g-nom">${g.nom}</span></td>
+      <td>${g.tags.map(t=>`<span class="guichet-tag ${t}">${t==='digital'?'🌐 En ligne':'⚡ Rapide'}</span>`).join('')}</td>
+      <td><span style="font-size:12.5px;color:var(--text-muted);">⏱️ ${g.delai}</span></td>
+      <td><span style="font-size:12.5px;color:var(--text-muted);">💰 ${g.cout}</span></td>
+      <td>${g.tel?`<span style="font-size:12px;color:var(--text-muted);">${g.tel}</span>`:''}</td>
+      <td><button class="g-btn" onclick="openLink('${g.url}')">🔗 Site officiel</button></td>
+    </tr>`).join('');
+  
+  document.getElementById('guichetGrid').innerHTML = `
+    <div class="guichet-table-wrap">
+      <table class="guichet-table">
+        <thead><tr>
+          <th></th>
+          <th>Pays / Organisme</th>
+          <th>Type</th>
+          <th>Délai</th>
+          <th>Coût</th>
+          <th>Téléphone</th>
+          <th>Accès</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function openLink(url){window.open(url,'_blank');}
+
+// ===== CALCULATEUR CHARGES =====
+const chargesData={
+  senegal:{nom:'Sénégal',monnaie:'F CFA',
+    patron:{caisse_retraite:0.088,css_at:0.024,css_pf:0.072,total:0.184},
+    employe:{ipres:0.056,css:0.0},
+    ir:[[0,630000,0],[630001,1500000,0.20],[1500001,4000000,0.30],[4000001,8000000,0.35],[8000001,999999999,0.37]],
+    note:'Employeur : 8.4% IPRES + 2.4% AT + 7.2% PF = 18%. Employé : 5.6% IPRES. IR progressif.'},
+  cotedivoire:{nom:"Côte d'Ivoire",monnaie:'F CFA',
+    patron:{cnps_retraite:0.072,cnps_at:0.025,cnps_pf:0.075,total:0.172},
+    employe:{cnps:0.036,its:0.0},
+    ir:[[0,600000,0],[600001,1800000,0.14],[1800001,3600000,0.21],[3600001,7200000,0.28],[7200001,999999999,0.32]],
+    note:'Employeur : 7.2% retraite + 2.5% AT + 7.5% PF = 17.2%. Employé : 3.6% CNPS. ITS progressif.'},
+  cameroun:{nom:'Cameroun',monnaie:'F CFA',
+    patron:{cnps_vieillesse:0.04,cnps_at:0.017,cnps_allocfam:0.075,total:0.132},
+    employe:{cnps_vieillesse:0.042,irpp:0.0},
+    ir:[[0,2000000,0.10],[2000001,3000000,0.165],[3000001,5000000,0.275],[5000001,10000000,0.385],[10000001,999999999,0.385]],
+    note:'Employeur : 4% vieillesse + 1.7% AT + 7.5% AF = 13.2%. Employé : 4.2% vieillesse. IRPP progressif.'},
+  rdc:{nom:'RD Congo',monnaie:'USD/CDF',
+    patron:{inss_pension:0.05,inss_at:0.015,inss_allocfam:0.06,total:0.125},
+    employe:{inss_pension:0.035,ipr:0.0},
+    ir:[[0,1800000,0],[1800001,3600000,0.15],[3600001,7200000,0.25],[7200001,14400000,0.35],[14400001,999999999,0.40]],
+    note:'Employeur : 5% pension + 1.5% AT + 6% AF = 12.5%. Employé : 3.5% INSS. IPR progressif.'},
+  mali:{nom:'Mali',monnaie:'F CFA',
+    patron:{inps_retraite:0.039,inps_at:0.02,inps_allocfam:0.08,total:0.139},
+    employe:{inps:0.028,ipr:0.0},
+    ir:[[0,750000,0],[750001,1500000,0.10],[1500001,3000000,0.20],[3000001,6000000,0.28],[6000001,999999999,0.35]],
+    note:'Employeur : 3.9% retraite + 2% AT + 8% AF = 13.9%. Employé : 2.8% INPS. IPR progressif.'},
+  burkina:{nom:'Burkina Faso',monnaie:'F CFA',
+    patron:{cnss_retraite:0.055,cnss_at:0.02,cnss_pf:0.07,total:0.145},
+    employe:{cnss:0.055,iur:0.0},
+    ir:[[0,500000,0],[500001,1000000,0.12],[1000001,2000000,0.22],[2000001,4000000,0.30],[4000001,999999999,0.35]],
+    note:'Employeur : 5.5% retraite + 2% AT + 7% PF = 14.5%. Employé : 5.5% CNSS. IUR progressif.'},
+  togo:{nom:'Togo',monnaie:'F CFA',
+    patron:{cnss_retraite:0.05,cnss_at:0.02,cnss_pf:0.08,total:0.15},
+    employe:{cnss:0.04,irpp:0.0},
+    ir:[[0,900000,0],[900001,1800000,0.12],[1800001,3600000,0.22],[3600001,6000000,0.30],[6000001,999999999,0.35]],
+    note:'Employeur : 5% retraite + 2% AT + 8% PF = 15%. Employé : 4% CNSS. IRPP progressif.'},
+  gabon:{nom:'Gabon',monnaie:'F CFA',
+    patron:{cnss_retraite:0.05,cnss_at:0.025,cnss_allocfam:0.08,total:0.155},
+    employe:{cnss:0.025,irpp:0.0},
+    ir:[[0,1500000,0],[1500001,3000000,0.05],[3000001,5000000,0.10],[5000001,10000000,0.20],[10000001,999999999,0.35]],
+    note:'Employeur : 5% retraite + 2.5% AT + 8% AF = 15.5%. Employé : 2.5% CNSS. IRPP progressif.'},
+};
+
+function calcIR(brut,tranches){
+  let impot=0,prev=0;
+  for(const [min,max,taux] of tranches){
+    const tranche=Math.min(brut,max)-Math.min(brut,min);
+    if(tranche>0)impot+=tranche*taux;
+    if(brut<=max)break;
+  }
+  return Math.round(impot);
+}
+
+function updateCalcInfo(){
+  const pays=document.getElementById('calcPays').value;
+  const d=chargesData[pays];
+  if(d){document.getElementById('calcInfoBox').innerHTML=`<strong style="color:var(--gold-dark)">ℹ️ ${d.nom}</strong><br>${d.note}`;}
+  calcCharges();
+}
+
+
+function calcCharges(){
+  const pays=document.getElementById('calcPays').value;
+  const brut=parseFloat(document.getElementById('calcSalaire').value)||0;
+  const d=chargesData[pays];
+  if(!d||!brut){
+    document.getElementById('calcResult').innerHTML=`<div class="r-empty">Saisissez un salaire brut pour voir le résultat</div>`;
+    return;
+  }
+  const cotisPatron=Math.round(brut*d.patron.total);
+  const cotisEmploye=Math.round(brut*d.employe[Object.keys(d.employe)[0]]);
+  const baseIR=brut-cotisEmploye;
+  const ir=calcIR(baseIR,d.ir);
+  const net=Math.round(brut-cotisEmploye-ir);
+  const coutTotal=Math.round(brut+cotisPatron);
+  const tauxEmployeur=Math.round(d.patron.total*100);
+  const tauxEmploye=Math.round(d.employe[Object.keys(d.employe)[0]]*100);
+  const fmt=n=>n.toLocaleString('fr-FR');
+  const pct=Math.round(net/brut*100);
+
+  document.getElementById('calcResult').innerHTML=`
+    <table class="calc-result-table">
+      <tr><td class="r-label">💼 Salaire brut</td><td class="r-value" style="color:#fff;font-size:15px;">${fmt(brut)} ${d.monnaie}</td></tr>
+      <tr style="height:8px;"><td colspan="2"></td></tr>
+      <tr><td class="r-label">🏢 Cotisations patron (${tauxEmployeur}%)</td><td class="r-value" style="color:#F09595;">− ${fmt(cotisPatron)} ${d.monnaie}</td></tr>
+      <tr><td class="r-label">👤 Cotisations salarié (${tauxEmploye}%)</td><td class="r-value" style="color:#F09595;">− ${fmt(cotisEmploye)} ${d.monnaie}</td></tr>
+      <tr><td class="r-label">🧾 Impôt sur le revenu</td><td class="r-value" style="color:#F09595;">− ${fmt(ir)} ${d.monnaie}</td></tr>
+      <tr style="height:8px;"><td colspan="2"></td></tr>
+      <tr style="border-top:2px solid rgba(200,150,42,0.4);">
+        <td style="padding-top:12px;font-weight:600;color:#fff;font-size:14px;">💰 Salaire net perçu</td>
+        <td style="padding-top:12px;text-align:right;font-weight:700;color:var(--gold);font-size:18px;">${fmt(net)} ${d.monnaie}</td>
+      </tr>
+      <tr>
+        <td style="color:rgba(255,255,255,0.6);font-size:12px;">📊 Coût total employeur</td>
+        <td style="text-align:right;color:var(--gold);font-weight:600;">${fmt(coutTotal)} ${d.monnaie}</td>
+      </tr>
+    </table>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+      <div style="background:rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:10px 12px;text-align:center;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Ratio net/brut</div>
+        <div style="font-size:22px;font-weight:700;color:var(--gold);">${pct}%</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:10px 12px;text-align:center;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Charge patronale</div>
+        <div style="font-size:22px;font-weight:700;color:var(--gold);">${tauxEmployeur}%</div>
+      </div>
+    </div>
+  `;
+}
+
+
+// ===== MODULES GESTION =====
+const moduleData={
+  compta:{title:'📒 Comptabilité SYSCOHADA',html:`
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Système minimal de trésorerie (Micro-entreprises)</strong><span>Livre recettes/dépenses. Pas de bilan. Seuil : CA &lt; 30M FCFA/an</span></div><div class="obl-freq unique">Simplifié</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>Système allégé (TPE)</strong><span>Journal trésorerie, balance comptes. Seuil : CA 30M–100M FCFA</span></div><div class="obl-freq annuel">Annuel</div></div>
+    <div class="obligation-item"><div class="obl-dot red"></div><div class="obl-body"><strong>Système normal (PME)</strong><span>Bilan, compte résultat, TAFIRE, notes annexes. CA &gt; 100M FCFA</span></div><div class="obl-freq mensuel">Mensuel</div></div>
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Livres comptables obligatoires</strong><span>Livre journal, grand livre, inventaire — à tenir sous peine de sanctions</span></div><div class="obl-freq unique">Légal</div></div>`},
+  travail:{title:'👷 Droit du travail OHADA',html:`
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>CDI — Contrat Durée Indéterminée</strong><span>Essai max 3 mois (renouvelable 1 fois). Voir modèle onglet Documents</span></div><div class="obl-freq unique">Standard</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>CDD — Contrat Durée Déterminée</strong><span>Max 2 ans. Renouvellement 1 fois. Au-delà = CDI automatique</span></div><div class="obl-freq unique">Limité</div></div>
+    <div class="obligation-item"><div class="obl-dot red"></div><div class="obl-body"><strong>Cotisations sociales</strong><span>Employeur : 13–18% brut. Employé : 3–6%. Déclaration mensuelle CNSS</span></div><div class="obl-freq mensuel">Mensuel</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>Congés annuels</strong><span>24 jours minimum/an (2 jours/mois). Congé maternité : 14 semaines min</span></div><div class="obl-freq annuel">Annuel</div></div>
+    <div class="obligation-item"><div class="obl-dot red"></div><div class="obl-body"><strong>Licenciement</strong><span>Motif réel et sérieux. Préavis selon ancienneté. Indemnité après 12 mois</span></div><div class="obl-freq unique">Légal</div></div>`},
+  fiscalite:{title:'🧾 Fiscalité en zone OHADA',html:`
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Impôt sur les Sociétés (IS)</strong><span>25–33% selon pays. Taux réduit TPE/PME possible (15–20%)</span></div><div class="obl-freq annuel">Annuel</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>TVA</strong><span>18–19.25% selon pays. Seuil assujettissement : CA &gt; 50–100M FCFA</span></div><div class="obl-freq mensuel">Mensuel</div></div>
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Patente professionnelle</strong><span>Taxe annuelle selon activité et CA — varie par pays</span></div><div class="obl-freq annuel">Annuel</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>Retenue à la source</strong><span>Sur salaires, dividendes, prestations. Déclaration mensuelle obligatoire</span></div><div class="obl-freq mensuel">Mensuel</div></div>
+    <div class="obligation-item"><div class="obl-dot red"></div><div class="obl-body"><strong>Régimes spéciaux TPE</strong><span>Forfait ou impôt synthétique unique dans plusieurs pays — renseignez-vous localement</span></div><div class="obl-freq annuel">Allégé</div></div>`},
+  obligations:{title:'📅 Calendrier des obligations légales',html:`
+    <div class="obligation-item"><div class="obl-dot red"></div><div class="obl-body"><strong>Chaque mois</strong><span>Déclaration TVA · Retenues source salaires · Cotisations CNSS/IPRES · Acomptes IS</span></div><div class="obl-freq mensuel">Mensuel</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>Chaque trimestre</strong><span>Acomptes IS · TVA trimestrielle (si option) · Rapport gestion SA</span></div><div class="obl-freq annuel">Trim.</div></div>
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Chaque année (avant 30 avril)</strong><span>Déclaration IS · Dépôt comptes au RCCM · Patente · AG annuelle sociétés</span></div><div class="obl-freq annuel">Annuel</div></div>
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Obligations permanentes</strong><span>Livres comptables à jour · Conserver pièces 10 ans · Afficher mentions légales</span></div><div class="obl-freq unique">Continu</div></div>`},
+  financement:{title:'🏦 Financement de l\'entreprise',html:`
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Microfinance (IMF)</strong><span>TPE/artisans. 50k–5M FCFA. Taux 12–36%/an. PAMECAS, Advans, ACEP, Baobab+</span></div><div class="obl-freq unique">Court terme</div></div>
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Fonds publics nationaux</strong><span>FONSIS (Sénégal), FIMAC (Cameroun), FASI (Burkina) — garantis par l'État</span></div><div class="obl-freq unique">Subvention</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>Banques commerciales</strong><span>Prêts PME : 9–15%/an. Exigent 2–3 ans d'activité, garanties, business plan</span></div><div class="obl-freq annuel">Moyen terme</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>Investisseurs (VC / Business Angels)</strong><span>Partech Africa, Janngo Capital, Orange Ventures, Seedstars Africa</span></div><div class="obl-freq unique">Equity</div></div>
+    <div class="obligation-item"><div class="obl-dot red"></div><div class="obl-body"><strong>Diaspora & famille</strong><span>Structurer via contrat de prêt ou entrée capital pour éviter conflits futurs</span></div><div class="obl-freq unique">Informel</div></div>`},
+  suretes:{title:'🔐 Sûretés et garanties (AUS OHADA)',html:`
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Nantissement fonds de commerce</strong><span>Garantie sur votre fonds pour crédit bancaire — inscrit au RCCM</span></div><div class="obl-freq unique">Mobilière</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>Nantissement de matériel</strong><span>Garantie sur équipements — fréquent pour artisans et industriels</span></div><div class="obl-freq unique">Mobilière</div></div>
+    <div class="obligation-item"><div class="obl-dot amber"></div><div class="obl-body"><strong>Cautionnement personnel</strong><span>Gérant garant personnel — risque élevé. Limiter durée et montant</span></div><div class="obl-freq unique">Personnelle</div></div>
+    <div class="obligation-item"><div class="obl-dot red"></div><div class="obl-body"><strong>Hypothèque</strong><span>Garantie immobilière — inscription livre foncier. Acte notarié obligatoire</span></div><div class="obl-freq unique">Immobilière</div></div>
+    <div class="obligation-item"><div class="obl-dot green"></div><div class="obl-body"><strong>Fonds de garantie publics</strong><span>FAGACE, FSA se portent garants à votre place — réduisent les exigences bancaires</span></div><div class="obl-freq unique">Publique</div></div>`},
+};
+
+function showModule(key){
+  const data=moduleData[key];if(!data)return;
+  document.querySelectorAll('.module-card').forEach(c=>c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  const box=document.getElementById('moduleContent');
+  box.style.display='block';
+  
+  // Parse HTML obligations into table rows
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = data.html;
+  const items = tempDiv.querySelectorAll('.obligation-item');
+  
+  let tableRows = '';
+  items.forEach(item => {
+    const dot = item.querySelector('.obl-dot');
+    const dotClass = dot ? (dot.classList.contains('red')?'red':dot.classList.contains('amber')?'amber':'green') : 'green';
+    const colors = {red:'#E24B4A',amber:'#EF9F27',green:'#639922'};
+    const bgColors = {red:'#FCEBEB',amber:'#FAEEDA',green:'#EAF3DE'};
+    const textColors = {red:'#A32D2D',amber:'#854F0B',green:'#3B6D11'};
+    const strong = item.querySelector('strong')?.textContent || '';
+    const span = item.querySelector('span')?.textContent || '';
+    const freq = item.querySelector('.obl-freq');
+    const freqText = freq ? freq.textContent : '';
+    const freqClass = freq ? (freq.classList.contains('mensuel')?'mensuel':freq.classList.contains('annuel')?'annuel':'unique') : 'unique';
+    
+    tableRows += `<tr>
+      <td style="width:8px;padding:10px 8px 10px 14px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${colors[dotClass]};margin-top:4px;"></div>
+      </td>
+      <td style="padding:10px 12px;">
+        <span style="display:block;font-size:13px;font-weight:500;color:var(--text-main);margin-bottom:2px;">${strong}</span>
+        <span style="font-size:11.5px;color:var(--text-muted);line-height:1.5;">${span}</span>
+      </td>
+      <td style="padding:10px 14px 10px 8px;text-align:right;white-space:nowrap;">
+        <span style="display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:10px;background:${bgColors[freqClass]};color:${textColors[freqClass]};">${freqText}</span>
+      </td>
+    </tr>`;
+  });
+  
+  box.innerHTML = `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+      <div style="background:var(--green-deep);padding:12px 16px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:18px;">${data.title.split(' ')[0]}</span>
+        <span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:#fff;">${data.title.substring(data.title.indexOf(' ')+1)}</span>
+      </div>
+      <div class="table-wrapper" style="border:none;border-radius:0;margin:0;">
+        <table class="data-table" style="border-radius:0;">
+          <thead><tr>
+            <th style="width:8px;border-radius:0;"></th>
+            <th style="border-radius:0;">Description</th>
+            <th style="text-align:right;border-radius:0;white-space:nowrap;">Fréquence</th>
+          </tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+
+// ===== DOCUMENTS =====
+const docTemplates={
+  sarl:{title:'Statuts SARL — Modèle OHADA',content:`STATUTS DE LA SOCIÉTÉ À RESPONSABILITÉ LIMITÉE
+Conformes à l'Acte Uniforme OHADA (AUDSCGIE)
+
+ENTRE LES SOUSSIGNÉS :
+1. [NOM PRÉNOM], né(e) le [DATE] à [LIEU], [NATIONALITÉ], demeurant à [ADRESSE]
+2. [NOM PRÉNOM], né(e) le [DATE] à [LIEU], [NATIONALITÉ], demeurant à [ADRESSE]
+
+ARTICLE 1 — FORME
+SARL régie par l'Acte Uniforme OHADA du 30 janvier 2014 (AUDSCGIE).
+
+ARTICLE 2 — DÉNOMINATION
+[NOM DE L'ENTREPRISE] SARL
+
+ARTICLE 3 — SIÈGE SOCIAL
+[ADRESSE COMPLÈTE]. Transfert possible par décision de gérance avec ratification associés.
+
+ARTICLE 4 — OBJET SOCIAL
+- [ACTIVITÉ PRINCIPALE]
+- [ACTIVITÉ SECONDAIRE]
+Et toutes opérations rattachées directement ou indirectement à cet objet.
+
+ARTICLE 5 — DURÉE : 99 ans à compter de l'immatriculation au RCCM.
+
+ARTICLE 6 — CAPITAL SOCIAL
+Capital : [MONTANT] F CFA divisé en [NOMBRE] parts de [VALEUR] F CFA.
+- [NOM 1] : [NOMBRE] parts — [MONTANT] F CFA
+- [NOM 2] : [NOMBRE] parts — [MONTANT] F CFA
+
+ARTICLE 7 — GÉRANCE
+Gérant : [NOM], nommé pour durée [DÉTERMINÉE/INDÉTERMINÉE].
+
+ARTICLE 8 — DÉCISIONS COLLECTIVES
+Ordinaires : majorité simple. Extraordinaires : 3/4 des parts.
+
+ARTICLE 9 — EXERCICE SOCIAL : 1er janvier au 31 décembre.
+
+ARTICLE 10 — RÉPARTITION BÉNÉFICES
+Proportionnelle au capital. Réserve légale : 5% jusqu'à 20% du capital.
+
+ARTICLE 11 — DISSOLUTION selon dispositions Acte Uniforme OHADA.
+
+Fait à [VILLE], le [DATE]
+[NOM 1] _______________   [NOM 2] _______________
+
+⚠️ Modèle de base. Consultez un notaire pour la finalisation.`},
+  gie:{title:'Statuts GIE — Modèle OHADA',content:`ACTE CONSTITUTIF DU GROUPEMENT D'INTÉRÊT ÉCONOMIQUE
+Articles 869 à 881 de l'AUDSCGIE
+
+MEMBRES FONDATEURS :
+1. [NOM], [MÉTIER], [ADRESSE]
+2. [NOM], [MÉTIER], [ADRESSE]
+
+ARTICLE 1 — DÉNOMINATION : [NOM DU GIE]
+ARTICLE 2 — OBJET : [ACTIVITÉ COMMUNE — ex: achats groupés, commercialisation collective]
+ARTICLE 3 — SIÈGE : [ADRESSE]
+ARTICLE 4 — DURÉE : [X] ans, renouvelable
+ARTICLE 5 — CAPITAL : Libre (0 F CFA minimum légal — avantage GIE)
+ARTICLE 6 — ADMINISTRATEUR : [NOM]
+ARTICLE 7 — CONTRIBUTIONS : [MONTANT ou %] par membre par [PÉRIODE]
+ARTICLE 8 — DÉCISIONS : [MAJORITÉ / UNANIMITÉ] — 1 voix par membre
+ARTICLE 9 — DISSOLUTION : Unanimité des membres
+
+Fait à [VILLE], le [DATE]
+Signatures : _______________ _______________ _______________
+
+⚠️ GIE = responsabilité solidaire illimitée. Consultez un juriste.`},
+  cdi:{title:'Contrat CDI — Droit OHADA',content:`CONTRAT DE TRAVAIL À DURÉE INDÉTERMINÉE (CDI)
+
+EMPLOYEUR : [ENTREPRISE], RCCM n°[X], [ADRESSE], représenté par [NOM/QUALITÉ]
+SALARIÉ : [NOM PRÉNOM], né(e) [DATE] à [LIEU], CNI n°[X], demeurant [ADRESSE]
+
+ART. 1 — POSTE : [INTITULÉ] au sein de [SERVICE], à compter du [DATE]
+ART. 2 — ESSAI : [DURÉE] mois. Rupture libre sans préavis ni indemnité.
+ART. 3 — TEMPS : [X] heures/semaine. Horaires : [HORAIRES]
+ART. 4 — SALAIRE : [MONTANT] F CFA brut/mois, net [MONTANT]. Payable le [DATE].
+         Avantages : [TRANSPORT / LOGEMENT / REPAS]
+ART. 5 — CONGÉS : 24 jours ouvrables/an minimum (2 jours/mois)
+ART. 6 — CONFIDENTIALITÉ : obligation de discrétion sur infos commerciales/techniques
+ART. 7 — RUPTURE : Préavis [DURÉE] selon ancienneté. Indemnité licenciement après 12 mois.
+ART. 8 — DROIT APPLICABLE : Code du travail [PAYS] et conventions collectives secteur [X]
+
+Fait à [VILLE], le [DATE]
+Employeur _______________     Salarié _______________ (Lu et approuvé)`},
+  cdd:{title:'Contrat CDD — Droit OHADA',content:`CONTRAT DE TRAVAIL À DURÉE DÉTERMINÉE (CDD)
+
+EMPLOYEUR : [ENTREPRISE]  |  SALARIÉ : [NOM PRÉNOM]
+
+ART. 1 — MOTIF (obligatoire) :
+□ Remplacement salarié absent   □ Accroissement temporaire   □ Travail saisonnier
+Motif retenu : [PRÉCISER]
+
+ART. 2 — DURÉE : Du [DATE] au [DATE] — [X] mois
+⚠️ Maximum légal : 2 ans renouvellement compris. Au-delà = CDI automatique.
+
+ART. 3 — POSTE : [INTITULÉ] — [MISSIONS]
+ART. 4 — SALAIRE : [MONTANT] F CFA brut/mois
+ART. 5 — RENOUVELLEMENT : 1 fois maximum dans la limite de 2 ans total
+ART. 6 — FIN : De plein droit à l'échéance. Pas d'indemnité sauf convention collective.
+ART. 7 — RUPTURE ANTICIPÉE : Faute grave, accord mutuel ou force majeure uniquement.
+
+Fait à [VILLE], le [DATE]
+Employeur _______________     Salarié _______________`},
+  vente:{title:'Contrat de vente — OHADA',content:`CONTRAT DE VENTE COMMERCIALE
+
+VENDEUR : [NOM], RCCM [X], NIF [X], [ADRESSE]
+ACHETEUR : [NOM], RCCM [X], NIF [X], [ADRESSE]
+
+ART. 1 — OBJET : [MARCHANDISE / QUANTITÉ / QUALITÉ / NORMES]
+ART. 2 — PRIX : [MONTANT] F CFA HT. TVA [TAUX]%. Total TTC : [MONTANT]
+ART. 3 — PAIEMENT :
+□ Comptant livraison   □ [X] jours après livraison   □ Acompte [%] + solde livraison
+Retard : pénalités [1.5%]/mois
+ART. 4 — LIVRAISON : [ADRESSE], délai [DATE]. Frais à charge [VENDEUR/ACHETEUR]
+ART. 5 — RÉSERVE PROPRIÉTÉ : Jusqu'au paiement intégral
+ART. 6 — GARANTIE : Vices cachés pendant [DURÉE] après livraison
+ART. 7 — LITIGES : Médiation amiable. À défaut : Tribunal Commerce [VILLE] / CCJA-OHADA
+
+Fait à [VILLE], le [DATE]
+Vendeur _______________     Acheteur _______________`},
+  prestation:{title:'Contrat de prestation — Artisans TPE',content:`CONTRAT DE PRESTATION DE SERVICE
+
+PRESTATAIRE : [NOM/ACTIVITÉ], [ADRESSE], RCCM [X ou "en cours"]
+CLIENT : [NOM], [ADRESSE]
+
+ART. 1 — PRESTATION : [DESCRIPTION PRÉCISE]
+Ex: "Fabrication et pose 3 portes + 5 fenêtres en bois massif"
+
+ART. 2 — DÉLAI : Du [DATE] au [DATE] ou dans [X] jours après acompte reçu
+ART. 3 — PRIX : [MONTANT] F CFA [HT/TTC]
+- Acompte [30-50%] à la signature : [MONTANT] F CFA
+- Solde à réception : [MONTANT] F CFA
+ART. 4 — OBLIGATIONS PRESTATAIRE :
+- Réaliser conformément au contrat
+- Matériaux qualité : [PRÉCISER]
+- Respecter délais et informer de tout obstacle
+ART. 5 — OBLIGATIONS CLIENT :
+- Verser acompte à la signature
+- Donner accès aux locaux nécessaires
+- Réceptionner dans [5] jours après fin travaux
+ART. 6 — RÉCEPTION : Contradictoire. Réserves dans [7] jours. Sinon = acceptation.
+ART. 7 — LITIGES : Médiation puis Tribunal Commerce [VILLE]
+
+Fait à [VILLE], le [DATE]
+Prestataire _______________     Client _______________`},
+  bail:{title:'Bail commercial — OHADA',content:`CONTRAT DE BAIL COMMERCIAL
+Articles 101–135 de l'Acte Uniforme OHADA Droit Commercial Général
+
+BAILLEUR : [NOM], [ADRESSE]
+LOCATAIRE : [NOM], RCCM [X], [ADRESSE]
+
+ART. 1 — LOCAUX : [ADRESSE COMPLÈTE] — Surface [M²] — État [DESCRIPTION]
+ART. 2 — DESTINATION : Exclusivement pour [ACTIVITÉ PRÉCISE]
+ART. 3 — DURÉE : [X] ans à compter du [DATE]
+⚠️ OHADA : Droit au renouvellement protecteur du locataire commercial.
+ART. 4 — LOYER : [MONTANT] F CFA/mois, payable le [DATE]. Mode : [VIREMENT/CHÈQUE]
+Révision : tous les [3] ans selon [INDICE / ACCORD MUTUEL]
+ART. 5 — CHARGES : Locataire → [ÉLECTRICITÉ/EAU/ENTRETIEN]. Bailleur → [GROSSES RÉPARATIONS]
+ART. 6 — DÉPÔT GARANTIE : [2–3 mois] = [MONTANT] F CFA. Restitution dans [30] jours fin bail.
+ART. 7 — DROIT RENOUVELLEMENT : Refus du bailleur = indemnité d'éviction obligatoire (sauf motif grave).
+ART. 8 — CESSION / SOUS-LOCATION : Accord écrit préalable bailleur requis.
+ART. 9 — RÉSILIATION : Préavis [3–6 mois] par lettre recommandée.
+
+Fait à [VILLE], le [DATE]
+Bailleur _______________     Locataire _______________`},
+  miseendemeure:{title:'Mise en demeure — Recouvrement OHADA',content:`MISE EN DEMEURE DE PAYER
+Acte Uniforme OHADA Procédures Simplifiées de Recouvrement
+
+[VOTRE NOM / SOCIÉTÉ] — [ADRESSE] — [TÉL/EMAIL]
+
+À [VILLE], le [DATE]
+ENVOI : Lettre recommandée avec accusé de réception
+
+À : [NOM DÉBITEUR], [ADRESSE]
+
+OBJET : Mise en demeure — Créance impayée de [MONTANT TOTAL] F CFA
+
+Monsieur / Madame,
+
+Nous vous mettons en demeure de régler :
+- Facture n°[X] du [DATE] : [MONTANT] F CFA
+- Facture n°[X] du [DATE] : [MONTANT] F CFA
+- Intérêts [TAUX]% depuis [DATE]   : [MONTANT] F CFA
+                          ───────────────
+TOTAL DÛ               : [MONTANT TOTAL] F CFA
+
+Exigible depuis [DATE]. Impayé malgré relances du [DATES].
+
+Vous disposez de HUIT (8) JOURS pour :
+□ Régler intégralement
+□ Nous contacter pour un plan d'apurement
+
+Passé ce délai, sans accord, nous engagerons :
+▸ Injonction de payer (art. 1–20 AU OHADA) — procédure rapide
+▸ Saisie conservatoire biens et comptes bancaires
+▸ Toutes voies d'exécution AUPSRVE OHADA
+
+Frais et honoraires d'avocat à votre charge.
+
+[SIGNATURE] — [NOM ET QUALITÉ] — [CACHET]
+
+PJ : Copies factures impayées
+
+⚠️ Non-paiement → Tribunal de Commerce pour injonction de payer.`},
+};
+
+let currentDoc=null;
+function openDoc(key){
+  const doc=docTemplates[key];if(!doc)return;
+  currentDoc=doc;
+  document.getElementById('modalTitle').textContent=doc.title;
+  document.getElementById('modalContent').textContent=doc.content;
+  document.getElementById('docModal').classList.add('open');
+}
+function closeModal(){document.getElementById('docModal').classList.remove('open');}
+function copyDoc(){
+  if(!currentDoc)return;
+  navigator.clipboard.writeText(currentDoc.content).then(()=>{
+    const btn=document.querySelector('.btn-copy');btn.textContent='✓ Copié !';
+    setTimeout(()=>btn.innerHTML='📋 <span data-i18n="d_copier">Copier</span>',2000);
+  });
+}
+function downloadDoc(){
+  if(!currentDoc)return;
+  const blob=new Blob([currentDoc.content],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=currentDoc.title.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.txt';
+  a.click();
+}
+document.getElementById('docModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+
+// ===== BUSINESS PLAN GENERATOR =====
+let bpText = '';
+async function generateBP(){
+  if(!APIKEY){document.getElementById('apikeyModal').style.display='flex';return;}
+  const nom=document.getElementById('bp_nom').value.trim();
+  const secteur=document.getElementById('bp_secteur').value;
+  const pays=document.getElementById('bp_pays').value;
+  const invest=document.getElementById('bp_invest').value;
+  const desc=document.getElementById('bp_desc').value.trim();
+  if(!nom||!desc){alert('Veuillez remplir le nom du projet et la description.');return;}
+  document.getElementById('bp_result').style.display='none';
+  document.getElementById('bp_loading').style.display='block';
+  document.getElementById('bp_btn').disabled=true;
+  const prompt=`Génère un business plan professionnel complet pour ce projet en zone OHADA:
+
+PROJET: ${nom}
+SECTEUR: ${secteur}
+PAYS: ${pays}
+INVESTISSEMENT: ${invest}
+DESCRIPTION: ${desc}
+
+Structure le business plan ainsi:
+1. RÉSUMÉ EXÉCUTIF
+2. PRÉSENTATION DU PROJET
+3. ÉTUDE DE MARCHÉ (analyse demande, concurrence, opportunités)
+4. STRATÉGIE COMMERCIALE (offre, prix, distribution, communication)
+5. PLAN OPÉRATIONNEL (ressources humaines, locaux, équipements)
+6. PLAN FINANCIER (investissement initial, charges mensuelles, revenus estimés, seuil rentabilité)
+7. CADRE JURIDIQUE OHADA (forme juridique recommandée, démarches création)
+8. FACTEURS CLÉS DE SUCCÈS ET RISQUES
+
+Sois précis, concret et adapté au contexte africain (${pays}). Inclus des chiffres réalistes.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':APIKEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    bpText=data.content?.[0]?.text||'Erreur de génération.';
+    document.getElementById('bp_content').textContent=bpText;
+    document.getElementById('bp_result').style.display='block';
+  }catch(e){
+    alert('Erreur de connexion. Vérifiez votre clé API.');
+  }
+  document.getElementById('bp_loading').style.display='none';
+  document.getElementById('bp_btn').disabled=false;
+}
+function downloadBP(){
+  if(!bpText)return;
+  const nom=document.getElementById('bp_nom').value||'business_plan';
+  const blob=new Blob([bpText],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=nom.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'_business_plan.txt';
+  a.click();
+}
+
+
+// ===== PAYMENT & FREEMIUM =====
+function payNow(plan){
+  selectedPlan = plan;
+  document.getElementById('planLabel').textContent = plan === 'mensuel' ? 'Mensuel' : 'Annuel';
+  document.getElementById('planPrice').textContent = plan === 'mensuel' ? '5 000 F CFA' : '42 000 F CFA';
+  document.getElementById('paywallModal').style.display = 'none';
+  document.getElementById('cinetpayModal').style.display = 'flex';
+}
+
+function processCinetPay(){
+  const phone = document.getElementById('payPhone').value.trim();
+  const email = document.getElementById('payEmail').value.trim();
+  if(!phone || !email){ alert('Veuillez remplir tous les champs.'); return; }
+  
+  const amount = selectedPlan === 'mensuel' ? 5000 : 42000;
+  const txId = 'OHADA_' + Date.now();
+  
+  // CinetPay integration
+  // IMPORTANT: Remplacez VOTRE_SITE_ID et VOTRE_API_KEY par vos vrais identifiants CinetPay
+  const cinetpayConfig = {
+    apikey: 'VOTRE_API_KEY_CINETPAY', // Remplacez ici
+    site_id: 'VOTRE_SITE_ID_CINETPAY', // Remplacez ici
+    notify_url: 'https://agent-org-ohada-site.netlify.app/api/payment-notify',
+    return_url: window.location.href,
+    transaction_id: txId,
+    amount: amount,
+    currency: 'XOF',
+    channels: 'ALL',
+    description: 'Abonnement Agent OHADA ' + selectedPlan,
+    customer_phone_number: phone,
+    customer_email: email,
+    customer_name: 'Entrepreneur OHADA',
+    lang: 'fr',
+    metadata: JSON.stringify({plan: selectedPlan, email: email})
+  };
+
+  // Simulate payment for demo (remove in production)
+  if(cinetpayConfig.apikey === 'VOTRE_API_KEY_CINETPAY'){
+    // Demo mode
+    document.getElementById('cinetpayModal').style.display = 'none';
+    simulatePaymentSuccess(email, selectedPlan);
+    return;
+  }
+
+  // Real CinetPay payment
+  if(typeof CinetPay !== 'undefined'){
+    CinetPay.setConfig(cinetpayConfig);
+    CinetPay.getCheckout({
+      onSuccess: function(data){ 
+        activatePro(email, selectedPlan);
+      },
+      onError: function(data){ 
+        alert('Erreur de paiement. Réessayez.'); 
+      }
+    });
+  }
+}
+
+function simulatePaymentSuccess(email, plan){
+  // Demo: activate pro directly
+  activatePro(email, plan);
+}
+
+function activatePro(email, plan){
+  localStorage.setItem('ohada_pro', 'true');
+  localStorage.setItem('ohada_email', email);
+  localStorage.setItem('ohada_plan', plan);
+  freeQuestions = 0;
+  document.getElementById('paywallModal').style.display = 'none';
+  document.getElementById('cinetpayModal').style.display = 'none';
+  
+  // Show success message
+  addMsg('ai', '🎉 **Bienvenue dans Agent OHADA Pro !** Votre abonnement est activé. Vous avez maintenant un accès illimité à tous les modules. Posez vos questions !');
+}
+
+// Check pro status on load
+document.addEventListener('DOMContentLoaded', function(){
+  const isPro = localStorage.getItem('ohada_pro') === 'true';
+  if(isPro){
+    const email = localStorage.getItem('ohada_email') || '';
+    console.log('Pro user:', email);
+  }
+  // Hide old API modal
+  const modal = document.getElementById('apikeyModal');
+  if(modal) modal.style.display = 'none';
+});
+
+// ===== INIT =====
+loadChecklist('senegal',document.querySelector('.country-pill'));
+updateCalcInfo();
+</script>
+
+
+<!-- FREEMIUM PAYWALL MODAL -->
+<div class="apikey-modal" id="paywallModal" style="display:none;">
+  <div class="apikey-box" style="max-width:480px;">
+    <div style="text-align:center;margin-bottom:1.25rem;">
+      <div style="font-size:40px;margin-bottom:8px;">🌍</div>
+      <h2 style="font-size:22px;margin-bottom:6px;">Passez à Agent OHADA Pro</h2>
+      <p style="font-size:13px;color:#6B6458;line-height:1.6;">Vous avez utilisé vos <strong>3 questions gratuites</strong>.<br>Abonnez-vous pour un accès illimité.</p>
+    </div>
+    <div style="background:#F8F5EF;border-radius:10px;padding:1rem;margin-bottom:1.25rem;">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#6B6458;margin-bottom:10px;">✨ Ce que vous obtenez</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> Chat IA juridique illimité</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> Générateur de Business Plan</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> Checklist 13 pays OHADA</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> 8 modèles de documents juridiques</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> Calculateur de charges sociales</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;">
+      <div style="border:2px solid #C8962A;border-radius:10px;padding:12px;text-align:center;cursor:pointer;" onclick="payNow('mensuel')">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#8A6418;margin-bottom:4px;">Mensuel</div>
+        <div style="font-size:20px;font-weight:700;color:#1A3A2A;">5 000</div>
+        <div style="font-size:11px;color:#6B6458;">F CFA / mois</div>
+      </div>
+      <div style="border:2px solid #1A3A2A;border-radius:10px;padding:12px;text-align:center;cursor:pointer;background:#1A3A2A;position:relative;" onclick="payNow('annuel')">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#C8962A;color:#1A3A2A;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;">ÉCONOMISEZ 30%</div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:4px;">Annuel</div>
+        <div style="font-size:20px;font-weight:700;color:#fff;">42 000</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);">F CFA / an</div>
+      </div>
+    </div>
+    <button class="apikey-btn" id="payBtn" onclick="payNow('mensuel')" style="margin-bottom:8px;">💳 Payer avec Mobile Money</button>
+    <button class="apikey-skip" onclick="document.getElementById('paywallModal').style.display='none'">Continuer avec la version gratuite (limitée)</button>
+    <p style="font-size:10px;color:#A09585;text-align:center;margin-top:8px;">Wave · Orange Money · MTN · Moov · Carte bancaire</p>
+  </div>
+</div>
+
+<!-- CINETPAY PAYMENT MODAL -->
+<div class="apikey-modal" id="cinetpayModal" style="display:none;">
+  <div class="apikey-box" style="max-width:420px;">
+    <h2 style="margin-bottom:6px;">💳 Paiement sécurisé</h2>
+    <p style="font-size:13px;color:#6B6458;margin-bottom:1.25rem;line-height:1.6;">Entrez vos informations pour finaliser votre abonnement via CinetPay.</p>
+    <div style="margin-bottom:0.875rem;">
+      <label class="calc-label">Votre téléphone (Mobile Money)</label>
+      <input type="tel" class="calc-input" id="payPhone" placeholder="Ex: +221 77 123 45 67">
+    </div>
+    <div style="margin-bottom:0.875rem;">
+      <label class="calc-label">Votre email (reçu + accès)</label>
+      <input type="email" class="calc-input" id="payEmail" placeholder="votre@email.com">
+    </div>
+    <div style="background:#F8F5EF;border-radius:8px;padding:10px 12px;margin-bottom:1rem;font-size:12.5px;color:#6B6458;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Abonnement</span><span id="planLabel">Mensuel</span></div>
+      <div style="display:flex;justify-content:space-between;font-weight:600;color:#1A3A2A;font-size:14px;"><span>Total</span><span id="planPrice">5 000 F CFA</span></div>
+    </div>
+    <button class="apikey-btn" onclick="processCinetPay()">🔒 Confirmer le paiement</button>
+    <button class="apikey-skip" onclick="document.getElementById('cinetpayModal').style.display='none'">← Retour</button>
+    <p style="font-size:10px;color:#A09585;text-align:center;margin-top:8px;">Paiement sécurisé par CinetPay · SSL 256 bits</p>
+  </div>
+</div>
+
+<script src="https://cdn.cinetpay.com/seamless/main.js" type="text/javascript"></script>
+</body>
+</html>
