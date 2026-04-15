@@ -334,9 +334,6 @@ textarea::placeholder{color:var(--text-light);}
 .obl-title{font-size:13px;font-weight:500;color:var(--text-main);display:block;margin-bottom:2px;}
 .obl-desc{font-size:11.5px;color:var(--text-muted);line-height:1.5;}
 
-
-.apikey-skip{background:none;border:none;color:#A09585;font-size:12px;cursor:pointer;width:100%;margin-top:8px;font-family:'DM Sans',sans-serif;text-decoration:underline;}
-.free-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(200,150,42,0.15);border:1px solid rgba(200,150,42,0.25);border-radius:12px;padding:2px 8px;font-size:10px;color:var(--gold);margin-left:6px;}
 </style>
 </head>
 <body>
@@ -358,7 +355,6 @@ textarea::placeholder{color:var(--text-light);}
       <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
     <button onclick="resetApiKey()" style="background:rgba(200,150,42,0.15);border:1px solid rgba(200,150,42,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--gold);cursor:pointer;font-family:'DM Sans',sans-serif;">🔑 Clé API</button>
-    <span id="freeCounter" style="background:rgba(200,150,42,0.15);border:1px solid rgba(200,150,42,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--gold);">3 questions gratuites</span>
     <div class="badge-live"><span class="dot"></span><span id="badgeText">En ligne · 17 pays</span></div>
   </div>
 </header>
@@ -873,8 +869,7 @@ function showTab(name) {
 }
 
 // ===== CHAT =====
-let history=[],isLoading=false,APIKEY='',freeQuestions=0,MAX_FREE=3,selectedPlan='mensuel';
-const PROXY_URL='/api/chat';
+let history=[],isLoading=false,APIKEY='';
 
 function resetApiKey(){
   try{ localStorage.removeItem('ohada_key'); } catch(e){}
@@ -892,7 +887,10 @@ function saveApiKey(){
   var modal = document.getElementById('apikeyModal');
   if(modal) modal.style.display = 'none';
 }
-// DOMContentLoaded handled in payment section
+document.addEventListener('DOMContentLoaded', function(){
+  try{ localStorage.removeItem('ohada_key'); } catch(e){}
+  document.getElementById('apikeyModal').style.display = 'flex';
+});
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
 function askChat(q){showTab('chat');setTimeout(()=>{document.getElementById('chatInput').value=q;sendMessage();},100);}
@@ -925,7 +923,7 @@ function hideTyping(){const e=document.getElementById('typing-row');if(e)e.remov
 
 async function sendMessage(){
   if(isLoading)return;
-  if(!APIKEY){document.getElementById('apikeyModal').style.display='flex';return;}
+  
   const inp=document.getElementById('chatInput');
   const text=inp.value.trim();if(!text)return;
   inp.value='';inp.style.height='auto';
@@ -933,8 +931,8 @@ async function sendMessage(){
   addMsg('user',text);history.push({role:'user',content:text});showTyping();
   const sysPrompt = (i18n[currentLang.v]||i18n.fr).system_prompt || i18n.fr.system_prompt;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json','x-api-key':APIKEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    const res=await fetch('/api/chat',{
+      method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:sysPrompt,messages:history})
     });
     const data=await res.json();hideTyping();
@@ -945,14 +943,6 @@ async function sendMessage(){
       reply = (data.content&&data.content[0]&&data.content[0].text) ? data.content[0].text : "Désolé, réponse invalide. Vérifiez votre clé API.";
     }
     history.push({role:'assistant',content:reply});addMsg('ai',reply);
-    freeQuestions++;
-    const isPro2 = localStorage.getItem('ohada_pro') === 'true';
-    if(!isPro2 && freeQuestions >= MAX_FREE){
-      setTimeout(()=>{
-        addMsg('ai','💡 Vous avez utilisé vos **3 questions gratuites**. Abonnez-vous pour un accès illimité !');
-        setTimeout(()=>{ document.getElementById('paywallModal').style.display='flex'; }, 1500);
-      }, 500);
-    }
   }catch(e){
     hideTyping();
     if(!APIKEY){
@@ -995,7 +985,7 @@ function showResult(){
   const guichet=paysGuichet[a.pays]||'le guichet unique';
   const capLabel=a.capital==='zero'?'Capital libre':a.capital==='moyen'?'100k–1M FCFA':'>1M FCFA';
   const steps=[
-    {t:'Choisir votre forme juridique',d:`Recommandation : ${statut}`},
+    {t:'Choisir votre forme juridique',d:'Recommandation : '+statut},
     {t:'Rédiger les statuts',d:'Voir onglet Documents pour les modèles'},
     {t:'Déposer le capital en banque',d:capLabel+' — obtenir attestation de dépôt'},
     {t:'S\'immatriculer',d:guichet+' centralise toutes les formalités'},
@@ -1019,7 +1009,7 @@ function showResult(){
       <ul class="steps-list">${steps.map((s,i)=>`<li><div class="step-num">${i+1}</div><div class="step-body"><strong>${s.t}</strong><span>${s.d}</span></div></li>`).join('')}</ul>
     </div>
     <div style="display:flex;gap:8px;margin-top:0.4rem;flex-wrap:wrap;">
-      <button class="btn-next" onclick="askChat('Explique comment créer une ${statut} en zone OHADA étape par étape')">💬 En savoir plus</button>
+      <button class="btn-next" onclick="askChat('Explique comment créer une '+statut+' en zone OHADA étape par étape')">💬 En savoir plus</button>
       <button class="btn-prev" onclick="restartWizard()">↺ Recommencer</button>
     </div>`;
   for(let i=1;i<=5;i++){const s=document.getElementById('wstep'+i);if(s)s.style.display='none';}
@@ -1624,7 +1614,7 @@ document.getElementById('docModal').addEventListener('click',function(e){if(e.ta
 // ===== BUSINESS PLAN GENERATOR =====
 let bpText = '';
 async function generateBP(){
-  if(!APIKEY){document.getElementById('apikeyModal').style.display='flex';return;}
+  
   const nom=document.getElementById('bp_nom').value.trim();
   const secteur=document.getElementById('bp_secteur').value;
   const pays=document.getElementById('bp_pays').value;
@@ -1654,9 +1644,9 @@ Structure le business plan ainsi:
 
 Sois précis, concret et adapté au contexte africain (${pays}). Inclus des chiffres réalistes.`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
+    const res=await fetch('/api/chat',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':APIKEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:prompt}]})
     });
     const data=await res.json();
@@ -1678,160 +1668,20 @@ function downloadBP(){
   a.click();
 }
 
-
-// ===== PAYMENT & FREEMIUM =====
-function payNow(plan){
-  selectedPlan = plan;
-  document.getElementById('planLabel').textContent = plan === 'mensuel' ? 'Mensuel' : 'Annuel';
-  document.getElementById('planPrice').textContent = plan === 'mensuel' ? '5 000 F CFA' : '42 000 F CFA';
-  document.getElementById('paywallModal').style.display = 'none';
-  document.getElementById('cinetpayModal').style.display = 'flex';
-}
-
-function processCinetPay(){
-  const phone = document.getElementById('payPhone').value.trim();
-  const email = document.getElementById('payEmail').value.trim();
-  if(!phone || !email){ alert('Veuillez remplir tous les champs.'); return; }
-  
-  const amount = selectedPlan === 'mensuel' ? 5000 : 42000;
-  const txId = 'OHADA_' + Date.now();
-  
-  // CinetPay integration
-  // IMPORTANT: Remplacez VOTRE_SITE_ID et VOTRE_API_KEY par vos vrais identifiants CinetPay
-  const cinetpayConfig = {
-    apikey: 'VOTRE_API_KEY_CINETPAY', // Remplacez ici
-    site_id: 'VOTRE_SITE_ID_CINETPAY', // Remplacez ici
-    notify_url: 'https://agent-org-ohada-site.netlify.app/api/payment-notify',
-    return_url: window.location.href,
-    transaction_id: txId,
-    amount: amount,
-    currency: 'XOF',
-    channels: 'ALL',
-    description: 'Abonnement Agent OHADA ' + selectedPlan,
-    customer_phone_number: phone,
-    customer_email: email,
-    customer_name: 'Entrepreneur OHADA',
-    lang: 'fr',
-    metadata: JSON.stringify({plan: selectedPlan, email: email})
-  };
-
-  // Simulate payment for demo (remove in production)
-  if(cinetpayConfig.apikey === 'VOTRE_API_KEY_CINETPAY'){
-    // Demo mode
-    document.getElementById('cinetpayModal').style.display = 'none';
-    simulatePaymentSuccess(email, selectedPlan);
-    return;
-  }
-
-  // Real CinetPay payment
-  if(typeof CinetPay !== 'undefined'){
-    CinetPay.setConfig(cinetpayConfig);
-    CinetPay.getCheckout({
-      onSuccess: function(data){ 
-        activatePro(email, selectedPlan);
-      },
-      onError: function(data){ 
-        alert('Erreur de paiement. Réessayez.'); 
-      }
-    });
-  }
-}
-
-function simulatePaymentSuccess(email, plan){
-  // Demo: activate pro directly
-  activatePro(email, plan);
-}
-
-function activatePro(email, plan){
-  localStorage.setItem('ohada_pro', 'true');
-  localStorage.setItem('ohada_email', email);
-  localStorage.setItem('ohada_plan', plan);
-  freeQuestions = 0;
-  document.getElementById('paywallModal').style.display = 'none';
-  document.getElementById('cinetpayModal').style.display = 'none';
-  
-  // Show success message
-  addMsg('ai', '🎉 **Bienvenue dans Agent OHADA Pro !** Votre abonnement est activé. Vous avez maintenant un accès illimité à tous les modules. Posez vos questions !');
-}
-
-// Check pro status on load
-document.addEventListener('DOMContentLoaded', function(){
-  const isPro = localStorage.getItem('ohada_pro') === 'true';
-  if(isPro){
-    const email = localStorage.getItem('ohada_email') || '';
-    console.log('Pro user:', email);
-  }
-  // Hide old API modal
-  const modal = document.getElementById('apikeyModal');
-  if(modal) modal.style.display = 'none';
-});
-
 // ===== INIT =====
 loadChecklist('senegal',document.querySelector('.country-pill'));
 updateCalcInfo();
 </script>
 
-
-<!-- FREEMIUM PAYWALL MODAL -->
-<div class="apikey-modal" id="paywallModal" style="display:none;">
-  <div class="apikey-box" style="max-width:480px;">
-    <div style="text-align:center;margin-bottom:1.25rem;">
-      <div style="font-size:40px;margin-bottom:8px;">🌍</div>
-      <h2 style="font-size:22px;margin-bottom:6px;">Passez à Agent OHADA Pro</h2>
-      <p style="font-size:13px;color:#6B6458;line-height:1.6;">Vous avez utilisé vos <strong>3 questions gratuites</strong>.<br>Abonnez-vous pour un accès illimité.</p>
-    </div>
-    <div style="background:#F8F5EF;border-radius:10px;padding:1rem;margin-bottom:1.25rem;">
-      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#6B6458;margin-bottom:10px;">✨ Ce que vous obtenez</div>
-      <div style="display:flex;flex-direction:column;gap:7px;">
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> Chat IA juridique illimité</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> Générateur de Business Plan</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> Checklist 13 pays OHADA</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> 8 modèles de documents juridiques</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#1A1A18;"><span style="color:#2E5C3F;font-size:14px;">✓</span> Calculateur de charges sociales</div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;">
-      <div style="border:2px solid #C8962A;border-radius:10px;padding:12px;text-align:center;cursor:pointer;" onclick="payNow('mensuel')">
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:#8A6418;margin-bottom:4px;">Mensuel</div>
-        <div style="font-size:20px;font-weight:700;color:#1A3A2A;">5 000</div>
-        <div style="font-size:11px;color:#6B6458;">F CFA / mois</div>
-      </div>
-      <div style="border:2px solid #1A3A2A;border-radius:10px;padding:12px;text-align:center;cursor:pointer;background:#1A3A2A;position:relative;" onclick="payNow('annuel')">
-        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#C8962A;color:#1A3A2A;font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;">ÉCONOMISEZ 30%</div>
-        <div style="font-size:10px;font-weight:600;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:4px;">Annuel</div>
-        <div style="font-size:20px;font-weight:700;color:#fff;">42 000</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.6);">F CFA / an</div>
-      </div>
-    </div>
-    <button class="apikey-btn" id="payBtn" onclick="payNow('mensuel')" style="margin-bottom:8px;">💳 Payer avec Mobile Money</button>
-    <button class="apikey-skip" onclick="document.getElementById('paywallModal').style.display='none'">Continuer avec la version gratuite (limitée)</button>
-    <p style="font-size:10px;color:#A09585;text-align:center;margin-top:8px;">Wave · Orange Money · MTN · Moov · Carte bancaire</p>
+<div class="apikey-modal" id="apikeyModal">
+  <div class="apikey-box">
+    <h2>🔑 Activer le Conseiller IA</h2>
+    <p>Entrez votre clé API Anthropic pour activer le chat OHADA. Obtenez-la sur <strong>console.anthropic.com</strong> → API Keys → Create Key</p>
+    <input class="apikey-input" id="apikeyInput" type="password" placeholder="sk-ant-api03-..."/>
+    <button class="apikey-btn" onclick="saveApiKey()">✅ Activer l'Agent OHADA</button>
+    <p class="apikey-note">🔒 Votre clé reste uniquement sur votre appareil.<br>Elle n'est jamais partagée.</p>
+    <button class="apikey-skip" onclick="document.getElementById('apikeyModal').style.display='none'">Ignorer (chat désactivé)</button>
   </div>
 </div>
-
-<!-- CINETPAY PAYMENT MODAL -->
-<div class="apikey-modal" id="cinetpayModal" style="display:none;">
-  <div class="apikey-box" style="max-width:420px;">
-    <h2 style="margin-bottom:6px;">💳 Paiement sécurisé</h2>
-    <p style="font-size:13px;color:#6B6458;margin-bottom:1.25rem;line-height:1.6;">Entrez vos informations pour finaliser votre abonnement via CinetPay.</p>
-    <div style="margin-bottom:0.875rem;">
-      <label class="calc-label">Votre téléphone (Mobile Money)</label>
-      <input type="tel" class="calc-input" id="payPhone" placeholder="Ex: +221 77 123 45 67">
-    </div>
-    <div style="margin-bottom:0.875rem;">
-      <label class="calc-label">Votre email (reçu + accès)</label>
-      <input type="email" class="calc-input" id="payEmail" placeholder="votre@email.com">
-    </div>
-    <div style="background:#F8F5EF;border-radius:8px;padding:10px 12px;margin-bottom:1rem;font-size:12.5px;color:#6B6458;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Abonnement</span><span id="planLabel">Mensuel</span></div>
-      <div style="display:flex;justify-content:space-between;font-weight:600;color:#1A3A2A;font-size:14px;"><span>Total</span><span id="planPrice">5 000 F CFA</span></div>
-    </div>
-    <button class="apikey-btn" onclick="processCinetPay()">🔒 Confirmer le paiement</button>
-    <button class="apikey-skip" onclick="document.getElementById('cinetpayModal').style.display='none'">← Retour</button>
-    <p style="font-size:10px;color:#A09585;text-align:center;margin-top:8px;">Paiement sécurisé par CinetPay · SSL 256 bits</p>
-  </div>
-</div>
-
-<script src="https://cdn.cinetpay.com/seamless/main.js" type="text/javascript"></script>
 </body>
 </html>
